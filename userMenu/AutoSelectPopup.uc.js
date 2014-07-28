@@ -11,7 +11,6 @@ location == "chrome://browser/content/browser.xul" && (function() {
 				let menuItem = menugroup.appendChild($C("toolbarbutton", {
 					tooltiptext: menu.label,
 					image: menu.image,
-					class: "menuitem-iconic",
 					onclick: menu.onclick,
 					style: menu.style
 				}));
@@ -63,7 +62,6 @@ location == "chrome://browser/content/browser.xul" && (function() {
 	gBrowser.mPanelContainer.addEventListener("mouseup", function (event) {
 		var eName = event.target.nodeName || event.target.localName || event.target.tagName;
 		if (eName == "TEXTAREA" || eName == "INPUT" || event.target.isContentEditable) return;
-		if (!getBrowserSelection()) return;
 		if (event.button == 0 && getBrowserSelection()) {
 			$("auto-popup").openPopup(null, null, event.screenX - 100, event.screenY + 20);
 		}
