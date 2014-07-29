@@ -59,11 +59,12 @@ location == "chrome://browser/content/browser.xul" && (function() {
 		if (attr) Object.keys(attr).forEach(function(n) el.setAttribute(n, attr[n]));
 		return el;
 	}
-	gBrowser.mPanelContainer.addEventListener("mouseup", function (event) {
-		var eName = event.target.nodeName || event.target.localName || event.target.tagName;
-		if (eName == "TEXTAREA" || eName == "INPUT" || event.target.isContentEditable) return;
-		if (event.button == 0 && getBrowserSelection()) {
-			$("auto-popup").openPopupAtScreen(event.screenX - 90, event.screenY + 10, true);
+	gBrowser.mPanelContainer.addEventListener("mouseup", function (e) {
+		var eName = e.target.nodeName || e.target.localName || e.target.tagName;
+		if (eName == "TEXTAREA" || eName == "INPUT" || e.target.isContentEditable) return;
+		if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+		if (e.button == 0 && getBrowserSelection()) {
+			$("auto-popup").openPopupAtScreen(e.screenX - 90, e.screenY + 10, true);
 		}
 	}, false);
 })();
