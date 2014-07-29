@@ -37,7 +37,7 @@ location == "chrome://browser/content/browser.xul" && (function() {
 			onclick: "\
 			var TXT = encodeURIComponent(getBrowserSelection());\
 			if (event.button == 0) {gBrowser.selectedTab = gBrowser.addTab('https://encrypted.google.com/#q=' + TXT);}\
-			else if (event.button == 1) {gBrowser.selectedTab = gBrowser.addTab('https://encrypted.google.com/#q=' + content.location.host + ' ' + TXT);}\
+			else if (event.button == 1) {gBrowser.selectedTab = gBrowser.addTab('https://encrypted.google.com/#q=site:' + content.location.host + ' ' + TXT);}\
 			else if (event.button == 2) {gBrowser.selectedTab = gBrowser.addTab('https://duckduckgo.com/?q=!img ' + TXT);}\
 			",
 		},
@@ -63,7 +63,7 @@ location == "chrome://browser/content/browser.xul" && (function() {
 		var eName = event.target.nodeName || event.target.localName || event.target.tagName;
 		if (eName == "TEXTAREA" || eName == "INPUT" || event.target.isContentEditable) return;
 		if (event.button == 0 && getBrowserSelection()) {
-			$("auto-popup").openPopup(null, null, event.screenX - 100, event.screenY + 20);
+			$("auto-popup").openPopupAtScreen(event.screenX - 90, event.screenY + 10, true);
 		}
 	}, false);
 })();
