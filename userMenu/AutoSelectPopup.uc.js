@@ -19,11 +19,12 @@ location == "chrome://browser/content/browser.xul" && (function() {
 	};
 	var mMenus = [
 		{
-			label: '左鍵：複製為純文字\n右鍵：複製',
+			label: '左鍵：複製為純文字\n中鍵：複製為HTML\n右鍵：複製',
 			image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABlSURBVDhP5Y5BCsAgEAP3i/1AP+D/zxUlwWBXXQueOhAQzQStcN3p2UmVFK80C7QGH1aEBniOBPqhgRnsQB8P8KzRe+i/+YHCO+htQNPjdaB/G4D6hoWekFzQohfUxngSg4pglgGUsQ0ZR4jGSwAAAABJRU5ErkJggg==",
 			onclick: "\
 			if (event.button == 0) {Components.classes['@mozilla.org/widget/clipboardhelper;1'].getService(Components.interfaces.nsIClipboardHelper).copyString(content.getSelection());}\
-			else if (event.button == 2) {goDoCommand('cmd_copy'); document.getElementById('auto-popup').hidePopup();}\
+			else if (event.button == 1) {var div = content.document.createElement('div'); div.appendChild(content.getSelection().getRangeAt(0).cloneContents()); Components.classes['@mozilla.org/widget/clipboardhelper;1'].getService(Components.interfaces.nsIClipboardHelper).copyString(div.innerHTML);}\
+			else if (event.button == 2) {goDoCommand('cmd_copy');}\
 			"
 		},
 		{
