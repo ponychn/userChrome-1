@@ -39,23 +39,11 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 						gBrowser.selectedTab = gBrowser.addTab('https://encrypted.google.com/searchbyimage?image_url=' + encodeURIComponent(event.dataTransfer.getData("application/x-moz-file-promise-url")));
 					}
 				},
-				RL: {
-					name: "搜尋相似圖片(全部引擎)",
-					cmd: function(event, self) {
-						var imgURL = event.dataTransfer.getData("application/x-moz-file-promise-url");
-						gBrowser.addTab('http://www.tineye.com/search/?pluginver=firefox-1.0&sort=size&order=desc&url=' + encodeURIComponent(imgURL));
-						gBrowser.addTab('http://stu.baidu.com/i?rt=0&rn=10&ct=1&tn=baiduimage&objurl=' + encodeURIComponent(imgURL));
-						gBrowser.selectedTab = gBrowser.addTab('https://encrypted.google.com/searchbyimage?image_url=' + encodeURIComponent(imgURL));
-						gBrowser.addTab('http://pic.sogou.com/ris?query=' + encodeURIComponent(imgURL));
-						gBrowser.addTab('http://iqdb.org/?url=' + encodeURIComponent(imgURL));
-					}
-				},
 			},
 			link: {
 				U: {
 					name: "複製鏈結網址",
 					cmd: function(event, self) {
-//						gBrowser.addTab(event.dataTransfer.getData("text/x-moz-url").split("\n")[0]); 開啟及複製鏈結網址(新分頁前景)
 						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(event.dataTransfer.getData("text/x-moz-url").split("\n")[0]);
 					}
 				},
@@ -65,6 +53,8 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 						var linkTXT = event.dataTransfer.getData("text/x-moz-url").split("\n")[1];
 //						gFindBar.open();
 						gFindBar.toggleHighlight(1);
+						gFindBar.getElement('highlight').setAttribute("checked", "true");
+//						gFindBar.getElement('highlight').setAttribute("checkState", "1");
 						gFindBar._findField.value = linkTXT;
 						gWHT.addWord(linkTXT);
 						document.getElementById('searchbar').value = linkTXT;
@@ -86,23 +76,8 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 				L: {
 					name: "Google 翻譯鏈結文字 (中文)",
 					cmd: function(event, self) {
-						var div = content.document.documentElement.appendChild(content.document.createElement("div"));
-						div.style.cssText = "position:absolute;z-index:1000;border:2px solid #FFF;border-radius:5px;background-color:#3B3B3B;padding: 0px 3px 1px 3px;font-size:12pt;box-shadow: 0px 0px 4px #000;color:#FFF;opacity:0.95;left:" + +(event.clientX + content.scrollX + 10) + 'px;top:' + +(event.clientY + content.scrollY + 10) + "px";
-						var xmlhttp = new XMLHttpRequest;
-						xmlhttp.open("get", "http://translate.google.hk/translate_a/t?client=t&hl=zh-TW&sl=auto&tl=zh-TW&text=" + event.dataTransfer.getData("text/x-moz-url").split("\n")[1], 0);
-						xmlhttp.send();
-						div.textContent = eval("(" + xmlhttp.responseText + ")")[0][0][0];
-						content.addEventListener("click", function(e) {
-							if (e.button == 0) {
-							Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(div.textContent);
-								goDoCommand("cmd_paste");
-							}
-							else if (e.button == 2) {
-							gBrowser.selectedTab = gBrowser.addTab('https://translate.google.com/#auto/zh-TW/' + encodeURIComponent(event.dataTransfer.getData("text/x-moz-url").split("\n")[1]));
-							}
-							content.removeEventListener("click", arguments.callee, false);
-							div.parentNode.removeChild(div);
-						}, false);
+						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(event.dataTransfer.getData("text/x-moz-url").split("\n")[1]);
+						gTranslate.ZHTW(event);
 					}
 				},
 				LR: {
@@ -125,26 +100,8 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 				LD: {
 					name: "Google 翻譯鏈結文字 (英文)",
 					cmd: function(event, self) {
-						var div = content.document.documentElement.appendChild(content.document.createElement("div"));
-						div.style.cssText = "position:absolute;z-index:1000;border:solid 2px rgb(144,144,144);border-radius:5px;background:-moz-linear-gradient(top, rgb(252, 252, 252) 0%, rgb(245, 245, 245) 33%, rgb(245, 245, 245) 100%);padding: 0px 3px 1px 3px;font-size: 12pt;color: rgb(66,66,66);left:" + +(event.clientX + content.scrollX + 10) + 'px;top:' + +(event.clientY + content.scrollY + 10) + "px";
-						var xmlhttp = new XMLHttpRequest;
-						xmlhttp.open("get", "http://translate.google.hk/translate_a/t?client=t&hl=zh-TW&sl=auto&tl=en&text=" + event.dataTransfer.getData("text/x-moz-url").split("\n")[1], 0);
-						xmlhttp.send();
-						goDoCommand("cmd_cut");
-						for(var i = 0; i < xmlhttp.responseText.length; i++) {
-						div.textContent += eval("(" + xmlhttp.responseText + ")")[0][i][0];
-						content.addEventListener("click", function(e) {
-							if (e.button == 0) {
-							Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(div.textContent);
-								goDoCommand("cmd_paste");
-							}
-							else if (e.button == 2) {
-							gBrowser.selectedTab = gBrowser.addTab('https://translate.google.com/#auto/zh-TW/' + encodeURIComponent(event.dataTransfer.getData("text/x-moz-url").split("\n")[1]));
-							}
-							content.removeEventListener("click", arguments.callee, false);
-							div.parentNode.removeChild(div);
-						}, false);
-						};
+						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(event.dataTransfer.getData("text/x-moz-url").split("\n")[1]);
+						gTranslate.EN(event);
 					}
 				},
 				R: {
@@ -158,172 +115,62 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 				RL: {
 					name: "彈出搜索框(新分頁前景)",
 					cmd: function(event, self) {
-						var linkTXT = event.dataTransfer.getData("text/x-moz-url").split("\n")[1];
-						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(linkTXT);
+						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(event.dataTransfer.getData("text/x-moz-url").split("\n")[1]);
 						document.getAnonymousElementByAttribute(document.querySelector('#searchbar').searchButton, 'anonid', 'searchbar-popup').openPopup(null, null, event.screenX, event.screenY);
 					}
 				},
 				RU: {
 					name: "Google 加密站內搜尋及複製鏈結文字(新分頁前景)",
 					cmd: function(event, self) {
-						var linkTXT = event.dataTransfer.getData("text/x-moz-url").split("\n")[1];
-						gBrowser.selectedTab = gBrowser.addTab('https://encrypted.google.com/#q=site:' + content.location.host + ' ' + encodeURIComponent(linkTXT));
-						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(linkTXT);
+						gBrowser.selectedTab = gBrowser.addTab('https://encrypted.google.com/#q=site:' + content.location.host + ' ' + encodeURIComponent(event.dataTransfer.getData("text/x-moz-url").split("\n")[1]));
 					}
 				},
 			},
 			text: {
 				U: {
-					name: "複製",
-					cmd: function(event, self) {
-						goDoCommand("cmd_copy");
-					}
-				},
-				UD: {
-					name: "尋找 & 高亮關鍵字及複製選取文字",
-					cmd: function(event, self) {
-						var TXT = event.dataTransfer.getData("text/unicode");
-//						gFindBar.open();
-						gFindBar.toggleHighlight(1);
-						gFindBar._findField.value = TXT;
-						gWHT.addWord(TXT);
-						document.getElementById('searchbar').value = TXT;
-						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(TXT);
-					}
-				},
-				UR: {
-					name: "複製為HTML",
+					name: "複製為純文字 / HTML",
 					cmd: function(event, self) {
 						var div = content.document.createElement('div');
 						div.appendChild(content.getSelection().getRangeAt(0).cloneContents());
-						Components.classes["@mozilla.org/widget/clipboardhelper;1"].getService(Components.interfaces.nsIClipboardHelper).copyString(div.innerHTML);
+						var focused = document.commandDispatcher.focusedElement;
+						if (!focused) {var TXT = div.innerHTML;}
+						else {var TXT = event.dataTransfer.getData("text/unicode");}
+						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(TXT);
+						return;
 					}
 				},
 				D: {
-					name: "下載文字(不彈窗)",
+					name: "下載文字(不彈窗) / 貼上",
 					cmd: function(event, self) {
-						saveImageURL('data:text/plain;charset=UTF-8;base64,' + btoa(unescape(encodeURIComponent(event.dataTransfer.getData("text/unicode")))), event.dataTransfer.getData("text/unicode").slice(0, 5) + ".txt", null, null, true, null, document);
-					}
-				},
-				DU: {
-					name: "貼上",
-					cmd: function(event, self) {
-						goDoCommand("cmd_paste");
-					}
-				},
-				DR: {
-					name: "開啟選取範圍內的鏈結",
-					cmd: function(event, self) {
-						var urls = {};
-						addMenu.$$('a:not(:empty)', null, true).forEach(function(a) {
-							if (!urls[a.href] && /^http|^file|^about/.test(a.href))
-								gBrowser.addTab(a.href);
-							urls[a.href] = true;
-						});
-					}
-				},
-				DL: {
-					name: "開啟選取範圍內的圖片",
-					cmd: function(event, self) {
-						var urls = [];
-						addMenu.$$('a:not(:empty)', null, true).forEach(function(a) {
-							if (/\.(jpe?g|png|gif|bmp)$/i.test(a.href) && urls.indexOf(a.href) === -1)
-								urls.push(a.href);
-						});
-						if (urls.length === 0) return;
-
-						var htmlsrc = '<style> img {max-width: 100%; max-height: 100%;} </style>';
-						htmlsrc += urls.map(function(u) '\n<img src="' + u + '">').join("");
-						gBrowser.addTab("data:text/html;charset=utf-8," + encodeURIComponent(htmlsrc));
+						var focused = document.commandDispatcher.focusedElement;
+						if (!focused) {saveImageURL('data:text/plain;charset=UTF-8;base64,' + btoa(unescape(encodeURIComponent(event.dataTransfer.getData("text/unicode")))), event.dataTransfer.getData("text/unicode").slice(0, 5) + ".txt", null, null, true, null, document);}
+						else {goDoCommand("cmd_paste");}
+						return;
 					}
 				},
 				L: {
 					name: "Google 翻譯選取文字 (中文)",
 					cmd: function(event, self) {
-						var div = content.document.documentElement.appendChild(content.document.createElement("div"));
-						div.style.cssText = "position:absolute;z-index:1000;border:2px solid #FFF;border-radius:5px;background-color:#3B3B3B;padding: 0px 3px 1px 3px;font-size:12pt;box-shadow: 0px 0px 4px #000;color:#FFF;opacity:0.95;left:" + +(event.clientX + content.scrollX + 10) + 'px;top:' + +(event.clientY + content.scrollY + 10) + "px";
-						var xmlhttp = new XMLHttpRequest;
-						xmlhttp.open("get", "http://translate.google.hk/translate_a/t?client=t&hl=zh-TW&sl=auto&tl=zh-TW&text=" + event.dataTransfer.getData("text/unicode"), 0);
-						xmlhttp.send();
-						goDoCommand("cmd_cut");
-						for(var i = 0; i < xmlhttp.responseText.length; i++) {
-						div.textContent += eval("(" + xmlhttp.responseText + ")")[0][i][0];
-						content.addEventListener("click", function(e) {
-							if (e.button == 0) {
-							Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(div.textContent);
-								goDoCommand("cmd_paste");
-							}
-							else if (e.button == 2) {
-							gBrowser.selectedTab = gBrowser.addTab('https://translate.google.com/#auto/zh-TW/' + encodeURIComponent(event.dataTransfer.getData("text/unicode")));
-							}
-							content.removeEventListener("click", arguments.callee, false);
-							div.parentNode.removeChild(div);
-						}, false);
-						};
+						gTranslate.ZHTW(event);
 					}
 				},
 				LR: {
-					name: "Google 加密及百度圖片搜尋及複製選取文字",
-					cmd: function(event, self) {
-						var TXT = event.dataTransfer.getData("text/unicode");
-						gBrowser.selectedTab = gBrowser.addTab('https://duckduckgo.com/?q=!img ' + encodeURIComponent(TXT));
-						gBrowser.addTab('http://image.baidu.com/i?&cl=2&ie=utf-8&oe=utf-8&word=' + encodeURIComponent(TXT));
-						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(TXT);
-					}
-				},
-				LU: {
-					name: "Google 翻譯及複製選取文字(新分頁前景)",
-					cmd: function(event, self) {
-						var TXT = event.dataTransfer.getData("text/unicode");
-						gBrowser.selectedTab = gBrowser.addTab('https://translate.google.com/#auto/zh-TW/' + encodeURIComponent(TXT));
-						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(TXT);
-					}
-				},
-				LD: {
 					name: "Google 翻譯選取文字 (英文)",
 					cmd: function(event, self) {
-						var div = content.document.documentElement.appendChild(content.document.createElement("div"));
-						div.style.cssText = "position:absolute;z-index:1000;border:solid 2px rgb(144,144,144);border-radius:5px;background:-moz-linear-gradient(top, rgb(252, 252, 252) 0%, rgb(245, 245, 245) 33%, rgb(245, 245, 245) 100%);padding: 0px 3px 1px 3px;font-size: 12pt;color: rgb(66,66,66);left:" + +(event.clientX + content.scrollX + 10) + 'px;top:' + +(event.clientY + content.scrollY + 10) + "px";
-						var xmlhttp = new XMLHttpRequest;
-						xmlhttp.open("get", "http://translate.google.hk/translate_a/t?client=t&hl=zh-TW&sl=auto&tl=en&text=" + event.dataTransfer.getData("text/unicode"), 0);
-						xmlhttp.send();
-						goDoCommand("cmd_cut");
-						for(var i = 0; i < xmlhttp.responseText.length; i++) {
-						div.textContent += eval("(" + xmlhttp.responseText + ")")[0][i][0];
-						content.addEventListener("click", function(e) {
-							if (e.button == 0) {
-							Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(div.textContent);
-								goDoCommand("cmd_paste");
-							}
-							else if (e.button == 2) {
-							gBrowser.selectedTab = gBrowser.addTab('https://translate.google.com/#auto/zh-TW/' + encodeURIComponent(event.dataTransfer.getData("text/unicode")));
-							}
-							content.removeEventListener("click", arguments.callee, false);
-							div.parentNode.removeChild(div);
-						}, false);
-						};
+						gTranslate.EN(event);
 					}
 				},
 				R: {
-					name: "Google 加密搜尋及複製選取文字[識別URL並打開](新分頁前景)",
+					name: "Google 加密搜尋選取文字[識別URL並打開](新分頁前景)",
 					cmd: function(event, self) {
 						var TXT = event.dataTransfer.getData("text/unicode");
 						(/^\s*(?:(?:(?:ht|f)tps?:\/\/)?(?:(?:\w+?)(?:\.(?:[\w-]+?))*(?:\.(?:[a-zA-Z]{2,5}))|(?:(?:\d+)(?:\.\d+){3}))(?::\d{2,5})?(?:\/\S*|$)|data:(text|image)\/[\u0025-\u007a]+)\s*$/.test(TXT) && (gBrowser.selectedTab = gBrowser.addTab(TXT))) || (gBrowser.selectedTab = gBrowser.addTab("https://encrypted.google.com/#q=" + encodeURIComponent(TXT)));
-						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(TXT);
 					}
 				},
 				RL: {
 					name: "彈出搜索框(新分頁前景)",
 					cmd: function(event, self) {
 						document.getAnonymousElementByAttribute(document.querySelector('#searchbar').searchButton, 'anonid', 'searchbar-popup').openPopup(null, null, event.screenX, event.screenY);
-					}
-				},
-				RU: {
-					name: "Google 加密站內搜尋及複製選取文字(新分頁前景)",
-					cmd: function(event, self) {
-						var TXT = event.dataTransfer.getData("text/unicode");
-						gBrowser.selectedTab = gBrowser.addTab('https://encrypted.google.com/#q=site:' + content.location.host + ' ' + encodeURIComponent(TXT));
-						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(TXT);
 					}
 				},
 			},
