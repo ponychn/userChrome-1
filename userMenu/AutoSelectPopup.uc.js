@@ -16,7 +16,6 @@ location == "chrome://browser/content/browser.xul" && (function() {
 					tooltiptext: menu.label,
 					image: menu.image,
 					onclick: menu.onclick,
-					style: menu.style
 				}));
 			}
 		}
@@ -40,20 +39,16 @@ location == "chrome://browser/content/browser.xul" && (function() {
 			label: "左鍵：Google 加密\n中鍵：Google 加密站內\n右鍵：Google 加密圖片",
 			image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABWUlEQVQ4jaXTPUvDQBgH8HyzkiCVdlBcFD+CDgUn0bU5rUMRS6mD4BuCVgfFKmitCl0s+FKhvoEgVvsyWKuRS9JLcvm7tcplSHW44e6e5/c8x91JAaKFZJXWFELRzZBVWgsQLST9JfknInlt9ExRJLMMqSOG67ID7gLb5xbG100h1hNIFyzM51gbu61wnN7Znl14Al+GC7LTas9nMi20bPgHPnUXmatOxbE1E89v3D8wd8DAbGBiw0R/XMfupY3RJcM/oBCKkUUDiUMGF/h1HN+AQiiC0xSa4aL04mBgVvcPTKZNbBYspHIMy3mGJnXx+s4xmBARAVg4Ybh4ctAb66wNJXSUGxx7RfEqBaDa5EgdMSEwmWXIlnwA+Qcb5QbHcLLTbjBGcfboILLq4yX2xXVsFSzUP1zcVzmOb2zsF21EVsRkhVD89zPVJTmqhWWV1rsGVFqRo1r4G6iM33AbQTj+AAAAAElFTkSuQmCC",
 			onclick: "\
-			var TXT = encodeURIComponent(getBrowserSelection());\
-			if (event.button == 0) {gBrowser.selectedTab = gBrowser.addTab('https://encrypted.google.com/#q=' + TXT);}\
-			else if (event.button == 1) {gBrowser.selectedTab = gBrowser.addTab('https://encrypted.google.com/#q=site:' + content.location.host + ' ' + TXT);}\
-			else if (event.button == 2) {gBrowser.selectedTab = gBrowser.addTab('https://duckduckgo.com/?q=!img ' + TXT);}\
+			var url = ['https://duckduckgo.com/?q=!ge ', 'https://encrypted.google.com/#q=site:' + content.location.host + ' ', 'https://duckduckgo.com/?q=!img '];\
+			gBrowser.selectedTab = gBrowser.addTab(url[event.button] + encodeURIComponent(getBrowserSelection()));\
 			",
 		},
 		{
 			label: "左鍵：百度\n中鍵：百度貼吧\n右鍵：百度圖片",
 			image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABWUlEQVQ4jaWSy0sCURjF/XfuRugukha1CzeBCBKIFFFIBEGrCoRwE4EErlskoYW0EFy0iBAkCMFNBCGuKrqjNg6OgzOTjY+5nhbh3ehMrw/O8vud73E8hDL8Rx5CGf5ajoBCsQuvT0IubwIATk51xA/bsPkPAdFtBYQyLIXeUCpbYtybQtcd0Na+LHb2WiCUYTXaRC5vCsBdyXIG3D/0QCjD2qaCl9cB9g9UPFb66OgcuzEVmayBpmKjVLamAxJJTTg9PQ+mHm1+sQ5CGS4ujUlAJmuAUIaZOQkdnaNS7SMYlhGKyKjVh7B6I2EQi6uTAJsDV9fvqFT7YNIQsws10eAPNNDWODa2FHh9Eoq3H85faKk2/IHGRGCWV2RYvZH7Fzo6n9o8VmS9CcPkzoBUWv82umfnhjNgfEg3pdK6M8AwuUihP9DA0bGGRFJDMCyLYLmu8NsSgP/oExgMERjFwInkAAAAAElFTkSuQmCC",
 			onclick: "\
-			if (event.button == 0) {var url = 'http://www.baidu.com/s?ie=utf-8&wd=';}\
-			else if (event.button == 1) {var url = 'https://duckduckgo.com/?q=!tieba ';}\
-			else if (event.button == 2) {var url = 'http://image.baidu.com/i?&cl=2&ie=utf-8&oe=utf-8&word=';}\
-			gBrowser.selectedTab = gBrowser.addTab(url + encodeURIComponent(getBrowserSelection()));\
+			var url = ['http://www.baidu.com/s?ie=utf-8&wd=', 'https://duckduckgo.com/?q=!tieba ', 'http://image.baidu.com/i?&cl=2&ie=utf-8&oe=utf-8&word='];\
+			gBrowser.selectedTab = gBrowser.addTab(url[event.button] + encodeURIComponent(getBrowserSelection()));\
 			",
 		},
 	];
