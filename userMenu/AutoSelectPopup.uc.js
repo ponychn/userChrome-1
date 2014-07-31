@@ -6,7 +6,11 @@ location == "chrome://browser/content/browser.xul" && (function() {
 				style: "-moz-appearance: none; background: -moz-linear-gradient(top, rgb(252, 252, 252) 0%, rgb(245, 245, 245) 33%, rgb(245, 245, 245) 100%); border: 2px solid rgb(144,144,144); border-radius: 5px;"
 			}));
 			var menugroup = popup.appendChild($C("menugroup", {onclick: "document.getElementById('auto-popup').hidePopup();"}));
-
+			var ctrlCitem = popup.appendChild($C("menuitem", {
+				accesskey: "C",
+				command: "cmd_copy",
+				style: "-moz-appearance: none;"
+			}));
 			for (let i = 0, menu; menu = mMenus[i]; i++) {
 				let menuItem = menugroup.appendChild($C("toolbarbutton", {
 					tooltiptext: menu.label,
@@ -53,12 +57,23 @@ location == "chrome://browser/content/browser.xul" && (function() {
 			",
 		},
 	];
+	var css = '\
+		#auto-popup autorepeatbutton {display:none!important;}\
+		'.replace(/[\r\n\t]/g, '');;
+	ASP.style = addStyle(css);
 	ASP.init();
 	function $(id) document.getElementById(id);
 	function $C(name, attr) {
 		var el = document.createElement(name);
 		if (attr) Object.keys(attr).forEach(function(n) el.setAttribute(n, attr[n]));
 		return el;
+	}
+	function addStyle(css) {
+		var pi = document.createProcessingInstruction(
+			'xml-stylesheet',
+			'type="text/css" href="data:text/css;utf-8,' + encodeURIComponent(css) + '"'
+		);
+		return document.insertBefore(pi, document.documentElement);
 	}
 	gBrowser.mPanelContainer.addEventListener("mouseup", function (e) {
 		var eName = e.target.nodeName || e.target.localName || e.target.tagName;
