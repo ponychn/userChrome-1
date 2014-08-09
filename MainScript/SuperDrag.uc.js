@@ -51,13 +51,7 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 					name: "尋找 & 高亮關鍵字及複製鏈結文字",
 					cmd: function(event, self) {
 						var linkTXT = event.dataTransfer.getData("text/x-moz-url").split("\n")[1];
-//						gFindBar.open();
-						gFindBar.toggleHighlight(1);
-						gFindBar.getElement('highlight').setAttribute("checked", "true");
-//						gFindBar.getElement('highlight').setAttribute("checkState", "1");
-						gFindBar._findField.value = linkTXT;
-						gWHT.addWord(linkTXT);
-						document.getElementById('searchbar').value = linkTXT;
+						MGs.FindScroll(linkTXT, false);
 						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(linkTXT);
 					}
 				},
@@ -128,24 +122,17 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 			},
 			text: {
 				U: {
-					name: "複製為純文字 / HTML",
+					name: "尋找 & 高亮關鍵字及複製選取文字",
 					cmd: function(event, self) {
-						var div = content.document.createElement('div');
-						div.appendChild(content.getSelection().getRangeAt(0).cloneContents());
-						var focused = document.commandDispatcher.focusedElement;
-						if (!focused) {var TXT = div.innerHTML;}
-						else {var TXT = event.dataTransfer.getData("text/unicode");}
+						var TXT = event.dataTransfer.getData("text/unicode");
+						MGs.FindScroll(TXT, false);
 						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(TXT);
-						return;
 					}
 				},
 				D: {
-					name: "下載文字(不彈窗) / 貼上",
+					name: "下載文字(不彈窗)",
 					cmd: function(event, self) {
-						var focused = document.commandDispatcher.focusedElement;
-						if (!focused) {saveImageURL('data:text/plain;charset=UTF-8;base64,' + btoa(unescape(encodeURIComponent(event.dataTransfer.getData("text/unicode")))), event.dataTransfer.getData("text/unicode").slice(0, 5) + ".txt", null, null, true, null, document);}
-						else {goDoCommand("cmd_paste");}
-						return;
+						saveImageURL('data:text/plain;charset=UTF-8;base64,' + btoa(unescape(encodeURIComponent(event.dataTransfer.getData("text/unicode")))), event.dataTransfer.getData("text/unicode").slice(0, 5) + ".txt", null, null, true, null, document);
 					}
 				},
 				L: {
