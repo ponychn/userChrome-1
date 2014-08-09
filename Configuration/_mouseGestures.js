@@ -1,27 +1,22 @@
 GESTURES = {
 	'U': {
-		name: '上一頁(後退) / 滾動到頁面頂部',
+		name: '復原已關閉分頁',
 		cmd: function() {
-			var nav = gBrowser.webNavigation;
-			if (nav.canGoBack) {nav.goBack();}
-			else {content.scrollTo(0, 0);}
+			undoCloseTab();
+//			document.getElementById('History:UndoCloseTab').doCommand();
 		}
 	},
 	'D': {
-		name: '下一頁(前進) / 滾動到頁面底部',
+		name: '跳過緩存重新載入此分頁',
 		cmd: function() {
-			var nav = gBrowser.webNavigation;
-			if (nav.canGoForward) {nav.goForward();}
-			else {content.scrollTo(0, 1e10);}
+			BrowserReloadSkipCache();
 		}
 	},
 	'L': {
-		name: '上一頁',
+		name: '上一頁(後退)',
 		cmd: function(gestures, event) {
-			var url = content.location.href;
-			if (url.startsWith("file://")) {
-				MGs.goNumericURL(-1);
-			}
+			var nav = gBrowser.webNavigation;
+			if (nav.canGoBack) {nav.goBack();}
 			else {
 				var srcNode = window.FireGestures ? FireGestures.sourceNode : event.target,
 					doc = srcNode.ownerDocument;
@@ -35,12 +30,10 @@ GESTURES = {
 		}
 	},
 	'R': {
-		name: '下一頁',
+		name: '下一頁(前進)',
 		cmd: function(gestures, event) {
-			var url = content.location.href;
-			if (url.startsWith("file://")) {
-				MGs.goNumericURL(+1);
-			}
+			var nav = gBrowser.webNavigation;
+			if (nav.canGoForward) {nav.goForward();}
 			else {
 				var srcNode = window.FireGestures ? FireGestures.sourceNode : event.target,
 					doc = srcNode.ownerDocument;
@@ -58,8 +51,8 @@ GESTURES = {
 		cmd: function(gestures, event) {
 			var txt = document.getElementById("searchbar").value;
 			if (txt == "") {
-				var nav = gBrowser.webNavigation;
-				var url = content.location.href;
+				var nav = gBrowser.webNavigation,
+					url = content.location.href;
 				if (nav.canGoBack) {nav.goBack();}
 				else if (url.startsWith("file://")) {
 					MGs.goNumericURL(-1);
@@ -75,16 +68,7 @@ GESTURES = {
 					dispatchEvent('nextpage.back');
 				}
 			}
-			else {
-//				gFindBar.open();
-				gFindBar.toggleHighlight(1);
-				gFindBar.getElement('highlight').setAttribute("checked", "true");
-//				gFindBar.getElement('highlight').setAttribute("checkState", "1");
-				gFindBar._findField.value = txt;
-//				gFindBar.onFindAgainCommand(true);
-				gWHT.addWord(txt);
-				gWHT.find(txt, true);
-			}
+			else {MGs.FindScroll(txt, true);}
 			return;
 		}
 	},
@@ -93,8 +77,8 @@ GESTURES = {
 		cmd: function(gestures, event) {
 			var txt = document.getElementById("searchbar").value;
 			if (txt == "") {
-				var nav = gBrowser.webNavigation;
-				var url = content.location.href;
+				var nav = gBrowser.webNavigation,
+					url = content.location.href;
 				if (nav.canGoForward) {nav.goForward();}
 				else if (url.startsWith("file://")) {
 					MGs.goNumericURL(+1);
@@ -110,118 +94,70 @@ GESTURES = {
 					dispatchEvent('nextpage.go');
 				}
 			}
-			else {
-//				gFindBar.open();
-				gFindBar.toggleHighlight(1);
-				gFindBar.getElement('highlight').setAttribute("checked", "true");
-//				gFindBar.getElement('highlight').setAttribute("checkState", "1");
-				gFindBar._findField.value = txt;
-//				gFindBar.onFindAgainCommand(false);
-				gWHT.addWord(txt);
-				gWHT.find(txt, false);
-			}
+			else {MGs.FindScroll(txt, false);}
 			return;
 		}
 	},
 	'L<R': {
-		name: '貼上 / UTF-8 / 清除搜索欄關鍵字',
+		name: '貼上 / 高亮 / 複製頁面全部文字 / 重設(默認)',
 		cmd: function() {
-//			document.getElementById("charset.UTF-8").doCommand();
 			var txt = document.getElementById("searchbar").value;
 			if (txt == "") {
-				var focused = document.commandDispatcher.focusedElement;
+				var focused = document.commandDispatcher.focusedElement,
+					selected = getBrowserSelection();
 				if (focused) {goDoCommand("cmd_paste");}
-				else {BrowserSetForcedCharacterSet("UTF-8");}
+				else if (selected) {MGs.FindScroll(selected, false);}
+				else {
+					Components.classes['@mozilla.org/widget/clipboardhelper;1'].getService(Components.interfaces.nsIClipboardHelper).copyString(content.document.documentElement.textContent);
+					gWHT.destroyToolbar();
+				}
 				return;
 			}
-			else {
-				gFindBar.toggleHighlight(0);
-				gFindBar.getElement('highlight').setAttribute("checked", "false");
-//				gFindBar.getElement('highlight').setAttribute("checkState", "0");
-				document.getElementById("searchbar").value = '';
-				gFindBar._findField.value = '';
-				gFindBar._foundMatches.hidden = true;
-				gFindBar._foundMatches.value = '';
-				gWHT.destroyToolbar();
-			}
+			else {MGs.FindReset();}
 			return;
 		}
 	},
 	'L>R': {
-		name: '全選 & 複製頁面全部文字',
+		name: '複製 / 全選 & 複製',
 		cmd: function() {
-			var focused = document.commandDispatcher.focusedElement;
-//			document.getElementById("context-selectall").doCommand();
-			goDoCommand("cmd_selectAll");
-			if (focused) {goDoCommand("cmd_copy");}
-			else {Components.classes['@mozilla.org/widget/clipboardhelper;1'].getService(Components.interfaces.nsIClipboardHelper).copyString(content.document.documentElement.textContent);}
+			var selected = getBrowserSelection();
+			if (selected) {goDoCommand("cmd_copy");}
+			else {
+//				document.getElementById("context-selectall").doCommand();
+				goDoCommand("cmd_selectAll");
+				goDoCommand("cmd_copy");
+			}
 			return;
 		}
 	},
 	'UD': {
-		name: '跳過緩存重新載入此分頁',
-		cmd: function() {
-			BrowserReloadSkipCache();
-		}
-	},
-	'DU': {
-		name: '停止載入此分頁 & 切換油猴腳本、用戶樣式及UC腳本管理器顯示',
-		cmd: function() {
-			BrowserStop();
-			UCL.toggleUI(1);
-			USL.toggleUI(1);
-			userChromejs.toggleUI(1);
-		}
-	},
-	'LR': {
-		name: '轉繁體',
-		cmd: function() {
-			document.getElementById("tongwen-context-text-tra-item").doCommand();
-			document.getElementById("tongwen-context-clip-traditional-item").doCommand();
-			document.getElementById("tongwen-context-traditional-item").doCommand();
-		}
-	},
-	'RL': {
-		name: '轉簡體',
-		cmd: function() {
-			document.getElementById("tongwen-context-text-sim-item").doCommand();
-			document.getElementById("tongwen-context-clip-simplified-item").doCommand();
-			document.getElementById("tongwen-context-simplified-item").doCommand();
-//彈出搜索框(新分頁前景)			document.getAnonymousElementByAttribute(document.querySelector('#searchbar').searchButton, 'anonid', 'searchbar-popup').openPopup(null, null, 640, 369);
-		}
-	},
-	'UL': {
-		name: '啟用 / 停用 dTa 單鍵下載選擇器',
-		cmd: function() {
-			dTaTurboSelect.Toggle();
-		}
-	},
-	'UR': {
-		name: '啟用 / 停用DOM Inspector & Element Inspector(重新啟動瀏覽器)',
-		cmd: function() {
-			var { AddonManager } = Components.utils.import("resource://gre/modules/AddonManager.jsm", {});
-			var AddonIDs = [
-				'inspector@mozilla.org',
-				'InspectElement@zbinlin',
-				]
-			for(n=0; n<AddonIDs.length; n++) {
-			AddonManager.getAddonByID(AddonIDs[n], function(addon) {
-				addon.userDisabled = addon.userDisabled ? false : true;
-			});
-			}
-			Application.restart();
-		}
-	},
-	'DL': {
 		name: '啟用 / 停用自動翻頁',
 		cmd: function() {
 			uAutoPagerize.toggle();
 		}
 	},
-	'DR': {
-		name: 'Snaplinks 批量操作模式',
+	'DU': {
+		name: '啟用 / 停用 dTa 單鍵下載選擇器',
 		cmd: function() {
-			snapLinks.init();
+			dTaTurboSelect.Toggle();
+		}
+	},
+	'LR': {
+		name: '轉繁體',
+		cmd: function() {
+			function $(id) document.getElementById(id);
+			$("tongwen-context-text-tra-item").doCommand();
+			$("tongwen-context-clip-traditional-item").doCommand();
+			$("tongwen-context-traditional-item").doCommand();
+		}
+	},
+	'RL': {
+		name: '轉簡體',
+		cmd: function() {
+			function $(id) document.getElementById(id);
+			$("tongwen-context-text-sim-item").doCommand();
+			$("tongwen-context-clip-simplified-item").doCommand();
+			$("tongwen-context-simplified-item").doCommand();
 		}
 	},
 	'RU': {
@@ -238,34 +174,6 @@ GESTURES = {
 					gif.QueryInterface(Ci.nsIImageLoadingContent).getRequest(Ci.nsIImageLoadingContent.CURRENT_REQUEST).image.animationMode ^= 1;
 				} catch (e) {}
 			})
-		}
-	},
-	'LU': {
-		name: '暫時允許此頁面的所有物件',
-		cmd: function() {
-			noscriptOverlay.allowPage();
-		}
-	},
-	'LD': {
-		name: '取消暫時許可',
-		cmd: function() {
-			noscriptOverlay.revokeTemp();
-		}
-	},
-	'URDL': {
-		name: '全螢幕 & 隱藏工具列',
-		cmd: function() {
-//			resizeTo(screen.availWidth, screen.availHeight, moveTo(0, 0)); 窗口適應屏幕
-//			document.getElementById("View:FullScreen").doCommand(); 全螢幕
-			BrowserFullScreen();
-			FullScreen.setAutohide();
-//			UCL.toggle('ToggleToolbar.css');
-		}
-	},
-	'RULD': {
-		name: 'ScreenCapture',
-		cmd: function() {
-			var file = Cc['@mozilla.org/file/local;1'].createInstance(Ci.nsILocalFile);file.initWithPath("D:\\Program Files\\ScreenCapture\\screencapture.exe");file.launch();
 		}
 	},
 }
