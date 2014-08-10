@@ -103,8 +103,8 @@ SearchEngine-button
 			$('searchbar').value = '';
 			gFindBar._foundMatches.hidden = true;
 			gFindBar._foundMatches.value = '';
+			event.preventDefault();
 		}
-		event.preventDefault();
 	}, false);
 
 	FindScroll = {
@@ -148,8 +148,8 @@ SearchEngine-button
 		else if (event.button == 2) {
 			gWHT.destroyToolbar();
 			$('searchbar').value = '';
+			event.preventDefault();
 		}
-		event.preventDefault();
 	}, false);
 
 	gWHTFindScroll = {
