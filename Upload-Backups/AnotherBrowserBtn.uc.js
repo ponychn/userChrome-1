@@ -1,18 +1,17 @@
-(function(){
-	window.AnotherBrowser = {
+(function() {
+	AnotherBrowser = {
 		init: function() {
-			var bar = "TabsToolbar";
-			this.icon = $(bar).appendChild($C("toolbarbutton", {
+			this.icon = $("TabsToolbar").appendChild($C("toolbarbutton", {
 				id: "AnotherBrowser",
 				class: "toolbarbutton-1",
 				label: "另一個視窗",
 				tooltiptext: "顯示 Index",
-				image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA9ElEQVQ4jc3SwS4DcRDH8U94BJdK6RM4IpHwGNWn6M0zEK+g6nXcSTjJ7pIKDpKta3Uddsqq7ZKeTPLLHuY/35md+fE9WhgiR9GgHGdoz9XrI0Ea36pSPGMSkAkGs8LV6L6LA+zXaBtbOMJLZRItnOISVzWdZ7rGMdYC8h4QQ7ziEN1f/n+Kk5jkaQZ4i6LuHwBFTLITOylUFnIbyWyBRjF2EjtJqoAR9rCJTo02Iv8YsB+ALB42RQcP/wqQKg+wNOAOF8sA7pVn7GOdLx/0lNtedIVevL1RuvczBkof5BZ7IIv8VGn7lSqgHZCxZgeOcT7f/QP02IusQJoFMgAAAABJRU5ErkJggg==",
+				image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAArUlEQVQ4jc2TUQrDIBBE3wVMcoEk90iOmx5C/wO1f80FhNqL9CMDXYpCIIVWGFzX2dHVXYA7kIFk8AQ80ApePsvJiuUBTEAPjJpn4Cq7lz1/cCbFkuS0YwRWI7BWOOk/BLLyG+QctI5GIFY4GSCIsBrcgAvghEU+y4mKpTMnWTTmuk2F08H+z6VNZwRchdPCXiSlFJYDKfivPOLv6+C0wOlm2ii3c+DdzoFyO28vxlBcNJTkO0QAAAAASUVORK5CYII=",
 				onclick: "AnotherBrowser.openPanel(event);",
+				style: "padding: 0px; -moz-transform: scale(0.875);",
 			}));
 
-			// panel
-			var panel = $C("panel", {
+			this.panel = $("mainPopupSet").appendChild($C("panel", {
 				id: "AnotherBrowser-panel",
 				type: "arrow",
 				flip: "both",
@@ -20,10 +19,9 @@
 				consumeoutsideclicks: "false",
 				noautofocus: "false",
 				panelopen: "true",
-			});
+			}));
 
-			// panel 裡添加 iframe
-			panel.appendChild($C("iframe", {
+			this.panel.appendChild($C("iframe", {
 				id: "AnotherBrowser-iframe",
 				type: "content",
 				flex: "1",
@@ -32,22 +30,48 @@
 				autocompleteenabled: "true",
 				style: "width: 1024px; height: 768px;",
 			}));
-
-			var mainPopupSet = $("mainPopupSet");
-			mainPopupSet.appendChild(panel);
 		},
 		openPanel: function(event) {
-			var self = this;
-			var panel = $("AnotherBrowser-panel"),
+			var self = this,
+				panel = $("AnotherBrowser-panel"),
 				iframe = $("AnotherBrowser-iframe");
-			var openPopup = function() {
-				panel.openPopup(self.icon, "after_end", -8, 0, false, null, null);
-			};
+			panel.openPopup(self.icon);
 			iframe.contentDocument.location.href = "chrome://userchromejs/content/index.html";
-			openPopup();
+		},
+		addAutoPopup: function() {
+			var self = this;
+			this.icon.addEventListener('mouseover', function() {
+				if (self.hideTimer) {
+					clearTimeout(self.hideTimer);
+					self.hideTimer = null;
+				}
+				self.popupTimer = setTimeout(self.openPanel.bind(self), 100);
+			}, false);
+			this.icon.addEventListener('mouseout', function() {
+				if (self.popupTimer) {
+					clearTimeout(self.popupTimer);
+					self.popupTimer = null;
+				}
+				self.hideTimer = setTimeout(function() {
+					self.panel.hidePopup();
+				}, 500);
+			}, false);
+
+			this.panel.addEventListener('mouseover', function() {
+				if (self.hideTimer) {
+					clearTimeout(self.hideTimer);
+					self.hideTimer = null;
+				}
+			}, false);
+			this.panel.addEventListener('mouseout', function() {
+				self.hideTimer = setTimeout(function() {
+					self.panel.hidePopup();
+				}, 500);
+			}, false);
 		},
 	};
-	window.AnotherBrowser.init();
+	AnotherBrowser.init();
+	AnotherBrowser.addAutoPopup();
 
 	function $(id, doc) (doc || document).getElementById(id);
 	function $C(name, attr) {
