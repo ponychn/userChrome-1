@@ -193,21 +193,21 @@ SearchEngine-button
 	};
 	SearchGo = {
 		onClick: function(event) {
-			searchbar.value = "";
 			var url = [
 				'https://encrypted.google.com/#q=',
 				'https://translate.google.com/#auto/zh-TW/',
 				'https://encrypted.google.com/#q=site:' + content.location.host + ' '
 			];
 			gBrowser.selectedTab = gBrowser.addTab(url[event.button] + encodeURIComponent(searchbar.value || getBrowserSelection() || readFromClipboard()));
+			searchbar.value = "";
 			event.preventDefault();
 			event.stopPropagation();
 		},
 		onScroll: function(event) {
-			searchbar.value = "";
 			if (event.detail > 0) {var url = 'https://duckduckgo.com/?q=!img ';}
 			else {var url = 'http://image.baidu.com/i?&cl=2&ie=utf-8&oe=utf-8&word=';}
 			gBrowser.selectedTab = gBrowser.addTab(url + encodeURIComponent(searchbar.value || getBrowserSelection() || readFromClipboard()));
+			searchbar.value = "";
 			return;
 		}
 	};
