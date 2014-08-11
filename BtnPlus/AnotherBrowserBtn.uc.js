@@ -11,7 +11,7 @@
 				style: "padding: 0px; -moz-transform: scale(0.875);",
 			}));
 
-			var panel = $("mainPopupSet").appendChild($C("panel", {
+			this.panel = $("mainPopupSet").appendChild($C("panel", {
 				id: "AnotherBrowser-panel",
 				type: "arrow",
 				flip: "both",
@@ -21,7 +21,7 @@
 				panelopen: "true",
 			}));
 
-			panel.appendChild($C("iframe", {
+			this.panel.appendChild($C("iframe", {
 				id: "AnotherBrowser-iframe",
 				type: "content",
 				flex: "1",
@@ -44,8 +44,40 @@
 			iframe.contentDocument.location.href = url[event.button];
 			event.preventDefault();
 		},
+		addAutoPopup: function() {
+			var self = this;
+			this.icon.addEventListener('mouseover', function() {
+				if (self.hideTimer) {
+					clearTimeout(self.hideTimer);
+					self.hideTimer = null;
+				}
+				self.popupTimer = setTimeout(self.openPanel.bind(self), 100);
+			}, false);
+			this.icon.addEventListener('mouseout', function() {
+				if (self.popupTimer) {
+					clearTimeout(self.popupTimer);
+					self.popupTimer = null;
+				}
+				self.hideTimer = setTimeout(function() {
+					self.panel.hidePopup();
+				}, 500);
+			}, false);
+
+			this.panel.addEventListener('mouseover', function() {
+				if (self.hideTimer) {
+					clearTimeout(self.hideTimer);
+					self.hideTimer = null;
+				}
+			}, false);
+			this.panel.addEventListener('mouseout', function() {
+				self.hideTimer = setTimeout(function() {
+					self.panel.hidePopup();
+				}, 500);
+			}, false);
+		},
 	};
 	AnotherBrowser.init();
+	AnotherBrowser.addAutoPopup();
 
 	function $(id, doc) (doc || document).getElementById(id);
 	function $C(name, attr) {
