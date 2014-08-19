@@ -1,13 +1,23 @@
 location == "chrome://browser/content/browser.xul" && (function() {
-	var ExtensionBtn = $("TabsToolbar").appendChild($C("toolbarbutton", {
-		id: "Extension-button",
-		class: "toolbarbutton-1",
-		type: "menu",
-		label: "附加元件選單",
-		tooltiptext: "附加元件選單",
-		style: "list-style-image: url(chrome://mozapps/skin/extensions/extensionGeneric-16.png)",
-	}));
-	ExtensionBtn.appendChild($C("menupopup")).addEventListener("popupshowing", showExtensionList, false);
+	var TYPE = 0; // 0:按鈕 2:工具選單
+	if (TYPE == 0) {
+		var Icon = $("TabsToolbar").appendChild($C("toolbarbutton", {
+			id: "Extension-button",
+			class: "toolbarbutton-1",
+			type: "menu",
+		}));
+	}
+	else if (TYPE == 2) {
+		var dTS = $("devToolsSeparator");
+		var Icon = dTS.parentNode.insertBefore($C("menu", {
+			id: "Extension-Menu",
+			class: "menu-iconic",
+		}), dTS);
+	}
+	Icon.setAttribute("label", "附加元件選單");
+	Icon.setAttribute("tooltiptext", "附加元件選單");
+	Icon.setAttribute("image", "chrome://mozapps/skin/extensions/extensionGeneric-16.png");
+	Icon.appendChild($C("menupopup")).addEventListener("popupshowing", showExtensionList, false);
 
 	function showExtensionList(node) {
 		node = node.target;
@@ -17,7 +27,7 @@ location == "chrome://browser/content/browser.xul" && (function() {
 		var AddonManager = Components.utils.import('resource://gre/modules/AddonManager.jsm').AddonManager;
 		AddonManager.getAddonsByTypes(["extension"], function(extension) {
 			var item = [];
-			for(var i=0; i < extension.length; i++) {
+			for(var i = 0; i < extension.length; i++) {
 				item[i] = node.appendChild(document.createElement("menuitem"));
 				item[i].setAttribute("label", extension[i].name + ' [' + extension[i].version + ']');
 				item[i].setAttribute("type", "checkbox");
