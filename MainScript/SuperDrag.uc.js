@@ -70,8 +70,23 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 				L: {
 					name: "Google 翻譯鏈結文字 (中文)",
 					cmd: function(event, self) {
-						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(event.dataTransfer.getData("text/x-moz-url").split("\n")[1]);
-						gTranslate.ZHTW(event);
+						var div = content.document.documentElement.appendChild(content.document.createElement("div"));
+						div.style.cssText = "position:absolute;z-index:1000;border:2px solid #FFF;border-radius:5px;background-color:#3B3B3B;padding: 0px 3px 1px 3px;font-size:12pt;box-shadow: 0px 0px 4px #000;color:#FFF;opacity:0.95;left:" + +(event.clientX + content.scrollX + 10) + 'px;top:' + +(event.clientY + content.scrollY + 10) + "px";
+						var xmlhttp = new XMLHttpRequest;
+						xmlhttp.open("get", "http://translate.google.hk/translate_a/t?client=t&hl=zh-TW&sl=auto&tl=zh-TW&text=" + event.dataTransfer.getData("text/x-moz-url").split("\n")[1], 0);
+						xmlhttp.send();
+						div.textContent = eval("(" + xmlhttp.responseText + ")")[0][0][0];
+						content.addEventListener("click", function(e) {
+							if (e.button == 0) {
+							Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(div.textContent);
+								goDoCommand("cmd_paste");
+							}
+							else if (e.button == 2) {
+							gBrowser.selectedTab = gBrowser.addTab('https://translate.google.com/#auto/zh-TW/' + encodeURIComponent(event.dataTransfer.getData("text/x-moz-url").split("\n")[1]));
+							}
+							content.removeEventListener("click", arguments.callee, false);
+							div.parentNode.removeChild(div);
+						}, false);
 					}
 				},
 				LR: {
@@ -94,8 +109,23 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 				LD: {
 					name: "Google 翻譯鏈結文字 (英文)",
 					cmd: function(event, self) {
-						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(event.dataTransfer.getData("text/x-moz-url").split("\n")[1]);
-						gTranslate.EN(event);
+						var div = content.document.documentElement.appendChild(content.document.createElement("div"));
+						div.style.cssText = "position:absolute;z-index:1000;border:solid 2px rgb(144,144,144);border-radius:5px;background:-moz-linear-gradient(top, rgb(252, 252, 252) 0%, rgb(245, 245, 245) 33%, rgb(245, 245, 245) 100%);padding: 0px 3px 1px 3px;font-size: 12pt;color: rgb(66,66,66);left:" + +(event.clientX + content.scrollX + 10) + 'px;top:' + +(event.clientY + content.scrollY + 10) + "px";
+						var xmlhttp = new XMLHttpRequest;
+						xmlhttp.open("get", "http://translate.google.hk/translate_a/t?client=t&hl=zh-TW&sl=auto&tl=en&text=" + event.dataTransfer.getData("text/x-moz-url").split("\n")[1], 0);
+						xmlhttp.send();
+						div.textContent = eval("(" + xmlhttp.responseText + ")")[0][0][0];
+						content.addEventListener("click", function(e) {
+							if (e.button == 0) {
+							Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(div.textContent);
+								goDoCommand("cmd_paste");
+							}
+							else if (e.button == 2) {
+							gBrowser.selectedTab = gBrowser.addTab('https://translate.google.com/#auto/zh-TW/' + encodeURIComponent(event.dataTransfer.getData("text/x-moz-url").split("\n")[1]));
+							}
+							content.removeEventListener("click", arguments.callee, false);
+							div.parentNode.removeChild(div);
+						}, false);
 					}
 				},
 				R: {
@@ -132,19 +162,57 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 				D: {
 					name: "下載文字(不彈窗)",
 					cmd: function(event, self) {
-						saveImageURL('data:text/plain;charset=UTF-8;base64,' + btoa(unescape(encodeURIComponent(event.dataTransfer.getData("text/unicode")))), event.dataTransfer.getData("text/unicode").slice(0, 5) + ".txt", null, null, true, null, document);
+						DownloadText.Select();
 					}
 				},
 				L: {
 					name: "Google 翻譯選取文字 (中文)",
 					cmd: function(event, self) {
-						gTranslate.ZHTW(event);
+						var div = content.document.documentElement.appendChild(content.document.createElement("div"));
+						div.style.cssText = "position:absolute;z-index:1000;border:2px solid #FFF;border-radius:5px;background-color:#3B3B3B;padding: 0px 3px 1px 3px;font-size:12pt;box-shadow: 0px 0px 4px #000;color:#FFF;opacity:0.95;left:" + +(event.clientX + content.scrollX + 10) + 'px;top:' + +(event.clientY + content.scrollY + 10) + "px";
+						var xmlhttp = new XMLHttpRequest;
+						xmlhttp.open("get", "http://translate.google.hk/translate_a/t?client=t&hl=zh-TW&sl=auto&tl=zh-TW&text=" + event.dataTransfer.getData("text/unicode"), 0);
+						xmlhttp.send();
+						goDoCommand("cmd_cut");
+						for(var i = 0; i < xmlhttp.responseText.length; i++) {
+							div.textContent += eval("(" + xmlhttp.responseText + ")")[0][i][0];
+							content.addEventListener("click", function(e) {
+								if (e.button == 0) {
+								Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(div.textContent);
+									goDoCommand("cmd_paste");
+								}
+								else if (e.button == 2) {
+								gBrowser.selectedTab = gBrowser.addTab('https://translate.google.com/#auto/zh-TW/' + encodeURIComponent(event.dataTransfer.getData("text/unicode")));
+								}
+								content.removeEventListener("click", arguments.callee, false);
+								div.parentNode.removeChild(div);
+							}, false);
+						};
 					}
 				},
 				LR: {
 					name: "Google 翻譯選取文字 (英文)",
 					cmd: function(event, self) {
-						gTranslate.EN(event);
+						var div = content.document.documentElement.appendChild(content.document.createElement("div"));
+						div.style.cssText = "position:absolute;z-index:1000;border:solid 2px rgb(144,144,144);border-radius:5px;background:-moz-linear-gradient(top, rgb(252, 252, 252) 0%, rgb(245, 245, 245) 33%, rgb(245, 245, 245) 100%);padding: 0px 3px 1px 3px;font-size: 12pt;color: rgb(66,66,66);left:" + +(event.clientX + content.scrollX + 10) + 'px;top:' + +(event.clientY + content.scrollY + 10) + "px";
+						var xmlhttp = new XMLHttpRequest;
+						xmlhttp.open("get", "http://translate.google.hk/translate_a/t?client=t&hl=zh-TW&sl=auto&tl=en&text=" + event.dataTransfer.getData("text/unicode"), 0);
+						xmlhttp.send();
+						goDoCommand("cmd_cut");
+						for(var i = 0; i < xmlhttp.responseText.length; i++) {
+							div.textContent += eval("(" + xmlhttp.responseText + ")")[0][i][0];
+							content.addEventListener("click", function(e) {
+								if (e.button == 0) {
+								Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(div.textContent);
+									goDoCommand("cmd_paste");
+								}
+								else if (e.button == 2) {
+								gBrowser.selectedTab = gBrowser.addTab('https://translate.google.com/#auto/zh-TW/' + encodeURIComponent(event.dataTransfer.getData("text/unicode")));
+								}
+								content.removeEventListener("click", arguments.callee, false);
+								div.parentNode.removeChild(div);
+							}, false);
+						};
 					}
 				},
 				R: {
