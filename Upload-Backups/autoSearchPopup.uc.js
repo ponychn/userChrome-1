@@ -1,8 +1,9 @@
 location == "chrome://browser/content/browser.xul" && (autoSearchPopup = true) && gBrowser.mPanelContainer.addEventListener("mouseup", function (event) {
 	setTimeout(function () {
 		if (autoSearchPopup === true && event.button === 0 && event.target.ownerDocument.designMode !== "on" && getBrowserSelection()) {
-			var popup = document.getAnonymousElementByAttribute(document.querySelector("#searchbar").searchButton, "anonid", "searchbar-popup");
-			var text = getBrowserSelection();
+			var x = false; // false: 前景 | true: 背景
+			var popup = document.getAnonymousElementByAttribute(document.querySelector("#searchbar").searchButton, "anonid", "searchbar-popup"),
+				text = getBrowserSelection();
 
 			var MI1 = popup.appendChild(document.createElement("menuitem"));
 			MI1.setAttribute("label", "複製");
@@ -28,7 +29,9 @@ location == "chrome://browser/content/browser.xul" && (autoSearchPopup = true) &
 				popup.removeEventListener("command", serach, false);
 				gBrowser.removeEventListener("click", closeSerach, false)
 				setTimeout(function(selectedEngine) {
-					BrowserSearch.loadSearch(text, true);
+					if (x == false) {gBrowser.selectedTab = gBrowser.addTab();}
+					else if (x == true) {}
+					BrowserSearch.loadSearch(text, x);
 					popup.querySelectorAll("#" + selectedEngine.id)[0].click();
 				}, 10, popup.querySelector("*[selected=true]"))
 			}
