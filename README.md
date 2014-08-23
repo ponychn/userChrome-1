@@ -4,7 +4,9 @@ Firefox 介面
 按鈕模式<br>
 <img src="https://mozest.com/attachment/201408/11/100724_1407742327CYIc.png">
 工具選單模式<br>
-<img src="https://mozest.com/attachment/201408/11/100724_1407742328eKaa.png">
+<img src="https://mozest.com/attachment/201408/23/100724_14087594340p99.png">
+分頁右鍵選單<br>
+<img src="https://mozest.com/attachment/201408/23/100724_1408759434J4WT.png">
 UC 腳本整合帖
 ==========
 <b>UC 腳本參考和下載網址</b>
@@ -21,6 +23,7 @@ UC 腳本整合帖
 <li><a href="https://github.com/alice0775/userChrome.js">alice0775</a><br></li>
 <li><a href="https://github.com/Griever/userChromeJS">Griever</a><br></li>
 <li><a href="https://github.com/ywzhaiqi/userChromeJS">ywzhaiqi</a><br></li>
+<a href="http://ywzhaiqi.github.io/addMenu_creator/">addMenu 腳本配置生成器</a><br>
 <li><a href="https://github.com/lastdream2013/userChrome">lastdream2013</a><br></li>
 <li><a href="https://github.com/feiruo/userChromeJS">feiruo</a><br></li>
 <li><a href="https://github.com/defpt/userChromeJs">defpt</a><br></li>
@@ -97,8 +100,8 @@ xul
 <li><a href="http://bbs.kafan.cn/thread-1739635-1-1.html">[修改發佈] AnotherBrowserBtn.uc.js</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1748650-1-1.html">TriggerZone.uc.js</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1747400-1-1.html">ShowDateAndTime.uc.js - 顯示現時日期和時間</a><br></li>
-<li><a href="http://bbs.kafan.cn/thread-1739999-1-1.html">AllTabsBtnPlus.uc.js & 復原分頁選單相關uc腳本</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1755453-1-1.html">RightClickLinkinNewTab.uc.js 和 link 相關腳本</a><br></li>
+<li><a href="http://bbs.kafan.cn/thread-1739999-1-1.html">數個 UC 腳本 (LinkLocationbarLite, StarBtnPlus, AllTabsBtnPlus, ...)</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1739649-1-1.html">_addmenu.js - 快速回覆修改版 & 標點符號選單</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1750226-1-1.html">_addmenu.js - 搜索選單</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1752591-1-1.html">_addmenu.js - PreSuffixMenu</a><br></li>
@@ -115,8 +118,6 @@ xul
 <ol>
 <li><a href="http://g.mozest.com/thread-41396-1-1">個人整合帖</a><br></li>
 <li><a href="http://g.mozest.com/thread-44436-1-1">_addmenu.js配置 - 自用功能</a><br></li>
-<li><a href="http://g.mozest.com/thread-43774-1-1">StarBtnPlus.uc.js (5合1) (For Fx 29+)</a><br></li>
-<li><a href="http://g.mozest.com/thread-44687-1-1">LinkLocationbarLite.uc.js (For Fx29+) 修復顯示更多按鈕問題</a><br></li>
 <li><a href="http://g.mozest.com/thread-44453-1-1">拖曳或手勢功能</a><br></li>
 <li><a href="http://g.mozest.com/thread-44382-1-1">擴展/插件相關uc腳本</a><br></li>
 <li><a href="http://g.mozest.com/thread-43981-1-1">FindInUrlbar.uc.js</a><br></li>
