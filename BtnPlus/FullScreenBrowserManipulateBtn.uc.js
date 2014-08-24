@@ -1,0 +1,56 @@
+location == "chrome://browser/content/browser.xul" && (function() {
+	var FSBMBtn = {
+		init: function() {
+			$("window-controls").appendChild($C("button", {
+				id: "FS-min",
+				tooltiptext: "縮到最小",
+				style: "list-style-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAATCAYAAACORR0GAAAAIElEQVQ4jWNgGAWjYBSMgsENNDQ0/uPDQ8+iUTAKqAoAQiAXcehWZP0AAAAASUVORK5CYII='); margin: 0px 1px 0px 0px; padding: 0px; min-width: 26px; max-width: 26px; -moz-appearance: none; background: none; border: none; display:-moz-box; -moz-box-pack:center;",
+				oncommand: "window.minimize();",
+			}));
+			$("window-controls").appendChild($C("button", {
+				id: "FS-max",
+				tooltiptext: "還原",
+				style: "list-style-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAATCAYAAABlcqYFAAAALklEQVQ4jWNgGAVDEmhoaPzHh+niAIoNIOSDoWMJIblRSwafJRSDAc+Eo2BoAwBSdUfIdR+94AAAAABJRU5ErkJggg=='); margin: 0px 1px 0px 0px; padding: 0px; min-width: 25px; max-width: 25px; -moz-appearance: none; background: none; border: none; display:-moz-box; -moz-box-pack:center;",
+				oncommand: "BrowserFullScreen();",
+			}));
+			$("window-controls").appendChild($C("button", {
+				id: "FS-close",
+				tooltiptext: "關閉",
+				style: "list-style-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC0AAAATCAYAAAAEaoRHAAAAOElEQVRIie3UoRIAAAQEUf//0xSKpHFjX5Q23DADgHWepvczeuD54OLNds+YbLBMuNymZb8HgCcCOGxnmRIixesAAAAASUVORK5CYII='); margin: 0px 3px 0px 0px; padding: 0px; min-width: 45px; max-width: 45px; -moz-appearance: none; background: #3B3B3B; border: none; opacity:0.95; display:-moz-box; -moz-box-pack:center;",
+				oncommand: "BrowserTryToCloseWindow();",
+			}));
+		}
+	};
+	var css = '\
+		#FS-min:hover {\
+		list-style-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAATCAYAAACORR0GAAAAHUlEQVQ4jWNgGAWjYBSMgsEN/hMAQ8+iUTAKqAoAGsQ/wb4l19gAAAAASUVORK5CYII=")!important;\
+		background:#3665B3!important;\
+		}\
+		#FS-max:hover {\
+		list-style-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAATCAYAAABlcqYFAAAAK0lEQVQ4jWNgGAVDEvwnAOjiAIoNIOSDoWMJIblRSwafJRSDAc+Eo2BoAwDhusM9yjJALAAAAABJRU5ErkJggg==")!important;\
+		background:#3665B3!important;\
+		}\
+		#FS-close:hover {opacity:0.8!important;}\
+		#main-window[inFullscreen="true"] .titlebar-placeholder[type="caption-buttons"],\
+		#minimize-button,\
+		#restore-button,\
+		#close-button\
+		{display:none!important;}\
+		'.replace(/[\r\n\t]/g, '');;
+	FSBMBtn.style = addStyle(css);
+	FSBMBtn.init();
+
+	function $(id) document.getElementById(id);
+	function $C(name, attr) {
+		var el = document.createElement(name);
+		if (attr) Object.keys(attr).forEach(function(n) el.setAttribute(n, attr[n]));
+		return el;
+	}
+	function addStyle(css) {
+		var pi = document.createProcessingInstruction(
+			'xml-stylesheet',
+			'type="text/css" href="data:text/css;utf-8,' + encodeURIComponent(css) + '"'
+		);
+		return document.insertBefore(pi, document.documentElement);
+	}
+})();
