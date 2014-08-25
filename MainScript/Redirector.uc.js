@@ -115,6 +115,7 @@
 				let toggle = document.getElementById("redirector-toggle");
 				if (toggle) {
 					toggle.setAttribute("checked", this.state);
+					toggle.label = "重定向已" + (this.state ? "啟" : "停") + "用";
 				}
 				// update icon state
 				let icon = document.getElementById("redirector-icon");
@@ -147,7 +148,7 @@
 				// add menu
 				let xml = '\
 					<menupopup id="redirector-menupopup" onclick="event.preventDefault(); event.stopPropagation();">\
-						<menuitem label="啟用重定向" id="redirector-toggle" type="checkbox" autocheck="false" key="redirector-toggle-key" checked="' + this.state + '" oncommand="Redirector.toggle();" />\
+						<menuitem label="重定向已啟用" id="redirector-toggle" type="checkbox" autocheck="false" key="redirector-toggle-key" checked="' + this.state + '" oncommand="Redirector.toggle();" onclick="if (event.button !== 0) {Redirector.toggle();}" />\
 						<menuitem label="重載規則" id="redirector-reload" oncommand="Redirector.reload();"/>\
 						<menuitem label="編輯規則" id="redirector-edit" oncommand="Redirector.edit();"/>\
 						<menuseparator id="redirector-sepalator"/>\
@@ -223,6 +224,7 @@
 				menuitem.setAttribute("autocheck", "false");
 				menuitem.setAttribute("checked", this.rules[i].state != null ? this.rules[i].state : true);
 				menuitem.setAttribute("oncommand", "Redirector.toggle('"+ i +"');");
+				menuitem.setAttribute("onclick", "if (event.button !== 0) {Redirector.toggle('"+ i +"');}");
 				menuitem.setAttribute("disabled", !this.state);
 			}
 		},
