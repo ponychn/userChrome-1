@@ -7,52 +7,50 @@
 // @downloadURL https://github.com/feiruo/userChromeJS/tree/master/RefererChange
 // @description Refererの內容を柔軟に書き換えるUserScriptです。
 // ==/UserScript==
+
 var refererChanger = {};
-refererChanger.state = true; /* 啟動時是否啟用 */
-refererChanger.type = 2; // 0:按鈕 2:菜單
+refererChanger.state = true;	// 啟動時是否啟用
+refererChanger.type = 2;		// 0:按鈕 2:工具菜單
 refererChanger.fileName = 'local\\_refererChange.js';
-refererChanger.enabledLab = "破解圖片外鏈已開啟";
-refererChanger.disabledLab = "破解圖片外鏈已關閉";
 refererChanger.enabledSrc = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADHUlEQVQ4jX3T3U9bBRjH8ZN46d/BhTdk171TSGuTg6aTjHkhZqmF9bBkwY5RUAbtkI6W09EX6JDQClNejlJFNjZlHdIdVEIpzCbCDHUu01EcXU9L4cQs4euVM3PEX/K9/eS5eYTRmZQcnVnLDSgpTZ44ovHnCykpbejLlcvCP4vNrO083t093CuXKe/r/9vuns5OocTgdLrwDBhQUlppr8zAtYfI19bpuj7FaCqEcreb8XU34aQPe/RjHCN3aB35mcclnbCS1p4B/omUVt7XiVx/iOfGTUZXQkz+dI7hlUYiP1q5sizhm7+INPQZ7bENdrQjgNK+ztCN3+mau8rEupsryzYC37+DL/k2nsWT+JPNvBvso2PsHjntgLCy+jyg7esM3/yDztlRPlntoH+pHs93J3DdPs6FW8fxJM5Q39+L69Nf2C7svwgUyjoj3zzCMztHKHmJy0tWum6/Rfu3b9KZOMmHXzmRBq/SPbHF9pMjLniypxOb3yY0dxenEsPz9Vm8CRue+VN88HkT74UCdIwtcWkq+yIgT6S0fElnNJEjNr9NcHad8+56evzVeHyv0nXxBO7xH/DHf8P3xa88OgrYLeq0K2/QOiny/piZbkcNXo+baDSKu6OF0/1mGsKv0dbpIBqN0uPxHtrt9pbKysqXhb7xlJYv6iS3FljYvIXb7yIQCJDL5chmsywuLtIr99IX9LF5b5NsNouqqgQCAURR9AryeErLFw9Ibi0wOBnG2dZKOpPh/IUWxBoRm81GMBikra0Nm81GTU0Np886n6qqisPh0IRBJfUgXyhS3NPx+mQ+6ukhncnwZ17DZHqdRCJBOp0mmUwyPT2NyWQiPLWsqaqKy+XSheH4qncovnYnrKxqjed6D+zSmcN0JoPV7nhaVVWN0WjEYrFgsVgwGo1UVVVTf6rxgaqqNDQ0/PsTgiAIFRUVr4iiuCHLckFRlHw8HicSidDc3IzT6SQSiRCPx1EUJS/LckEUxQ3hP3vJYDAcM5vN961Wa1mSJL2pqemvurq6+tra2ipJkkqSJOlWq7VsNpvvGwyGY38DN9aNRVh5uVwAAAAASUVORK5CYII=";
 refererChanger.disabledSrc = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACN0lEQVQ4ja3TS08TURiHcb6UO+MlcWWMJkgILsQYJMRqNEYiBERKIQxSWi5TWlouY0GnMEJr5Sq1qG2qNExpK4kGgkaD9hJa5nRm2tOVf3c1kzaEhW/yrM7JL+/inKqq/zFOr2ia8kZTo4JITK4K8dpYQSR2z9ZgCeC80fRhJvNHUVWoeXpsGYUiLcmwLmxLJWBUEImsqBhdOoBpKQb98hycIgsh3gM+ZoAlYMTtKQceTgbRMvkFhzKFRdgmJcDsEomap7AtH4BZXYNzi8Xs52aMbzXBttmAsbAORl83dPYXaOO+Ik0qAHKewr76C/qVGbhiBoyFGzH88TqMgWtgPtTBHHiAGyMD6JjeRYoUYBEiWoDkKcbXfqNz0YlnkQ4MherBvK9F10Y1nrytBuO/i/qhp+h6voeklC8HJJVi8k0CzOIK2EAfBkMN0G9cRdv6FXT66/D4VSt01hn0uPaRPKqwwZFCwfmSYFfiaBU4MK/vo9/fCMZ3E+0v7+AWO4yO6RD65r6VAyaXSLIyhdOfAudLYmQxhkeGevSaL4Axnoe+uxYG/hPM7h8wzn9HohKQyVG0CZfRMnsJzfxFONpPYYerQZyrgaf3LJoc59A4dgYN1tPlwAAvkmyOIrD/rlRox4Pw5gTinnsI7q5rzhLZAljNBrxIsrmC5tJxJbJUC1gF8WdWyiGnUOTUIohaBFEpiEIhlVXEoSTDuhD995TH3ZF+uzsatAgRwp4g23yETLgjQyf8q8fPX8SIYXU9r0McAAAAAElFTkSuQmCC";
 
-refererChanger.sites = {
-
-};
+refererChanger.sites = {};
 refererChanger.init = function() {
 	this.reload();
-	var label = this.state ? this.enabledLab : this.disabledLab;
-//	var tooltiptext = this.state ? this.enabledTip : this.disabledTip;
+	var label = "破解圖片外鏈已" + (this.state ? "開啟" : "關閉");
+//	var tooltiptext = "破解圖片外鏈已" + (this.state ? "開啟" : "關閉");
 	var src = this.state ? this.enabledSrc : this.disabledSrc;
 	if (refererChanger.type == 0) {
-		var menuitem = document.getElementById('TabsToolbar').appendChild(document.createElement('toolbarbutton'));
-		menuitem.setAttribute('class', 'toolbarbutton-1');
+		var Icon = document.getElementById('TabsToolbar').appendChild(document.createElement('toolbarbutton'));
+			Icon.setAttribute('class', 'toolbarbutton-1');
 	}
 	else if (refererChanger.type == 2) {
-		var menuitem = document.createElement('menuitem');
-		menuitem.setAttribute('class', 'menuitem-iconic');
+		var Icon = document.createElement('menuitem');
+			Icon.setAttribute('class', 'menuitem-iconic');
 		var insPos = document.getElementById('devToolsSeparator');
-		insPos.parentNode.insertBefore(menuitem, insPos);
+			insPos.parentNode.insertBefore(Icon, insPos);
 	}
-	menuitem.setAttribute('id', 'RefererChanger');
-	menuitem.setAttribute('label', label);
-	menuitem.setAttribute("tooltiptext", '左鍵：重載配置\n中鍵：啟用 / 禁用\n右鍵：編輯配置');
-	menuitem.setAttribute('image', src);
-	menuitem.setAttribute('oncommand', 'refererChanger.reload(true);');
-	menuitem.setAttribute('onclick', 'if (event.button == 2) {event.preventDefault();closeMenus(event.currentTarget); refererChanger.edit();}else if(event.button == 1) { event.preventDefault(); refererChanger.RCToggle(); BrowserReloadSkipCache();}');
-	var os = Cc['@mozilla.org/observer-service;1'].getService(
-	Ci.nsIObserverService);
+	Icon.setAttribute('id', 'RefererChanger');
+	Icon.setAttribute('label', label);
+	Icon.setAttribute("tooltiptext", '左鍵：重載配置\n中鍵：啟用 / 禁用\n右鍵：編輯配置');
+	Icon.setAttribute('image', src);
+	Icon.setAttribute('oncommand', 'refererChanger.reload(true);');
+	Icon.setAttribute('onclick', 'if (event.button == 1) {refererChanger.RCToggle(); BrowserReloadSkipCache();} else if (event.button == 2) {event.preventDefault(); closeMenus(event.currentTarget); refererChanger.edit();}');
+	var os = Cc['@mozilla.org/observer-service;1'].getService(Ci.nsIObserverService);
 	os.addObserver(this, 'http-on-modify-request', false);
 };
+
 refererChanger.RCToggle = function() {
 	this.state = !this.state;
-	let menuitem = document.getElementById('RefererChanger');
+	let Icon = document.getElementById('RefererChanger');
 	try {
-		var label = this.state ? this.enabledLab : this.disabledLab;
-//		var tooltiptext = this.state ? this.enabledTip : this.disabledTip;
+		var label = "破解圖片外鏈已" + (this.state ? "開啟" : "關閉");
+//		var tooltiptext = "破解圖片外鏈已" + (this.state ? "開啟" : "關閉");
 		var src = this.state ? this.enabledSrc : this.disabledSrc;
-		menuitem.setAttribute("label", label);
-		menuitem.setAttribute("image", src);
+		Icon.setAttribute("label", label);
+//		Icon.setAttribute("tooltiptext", tooltiptext);
+		Icon.setAttribute("image", src);
 	} catch (e) {}
 };
 
@@ -177,8 +175,7 @@ refererChanger.observe = function(aSubject, aTopic, aData) {
 };
 
 refererChanger.unregister = function() {
-	var os = Cc['@mozilla.org/observer-service;1'].getService(
-	Ci.nsIObserverService);
+	var os = Cc['@mozilla.org/observer-service;1'].getService(Ci.nsIObserverService);
 	os.removeObserver(this, 'http-on-modify-request', false);
 };
 
