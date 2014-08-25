@@ -42,7 +42,7 @@
 (function(css) {
 
 var Config = {
-    isUrlbar: 1,                // 放置的位置，0 為可移動按鈕，1 為標籤欄
+    isUrlbar: 1,                // 放置的位置，0 為可移動按鈕，1 為固定位置
     ORIGINAL_SITEINFO: false,   // 原版JSON規則是否啟用？以國外網站為主
     UPDATE_CN_SITEINFO_DAYS: 7, // 更新中文規則的間隔（天）
     SEND_COOKIE: false,         // 是否額外的獲取 cookie？百度有問題時需要清除 cookie
@@ -430,10 +430,11 @@ var ns = window.uAutoPagerize = {
                 state: "disable",
                 tooltiptext: "disable",
                 onclick: "uAutoPagerize.iconClick(event);",
-				style: "padding: 0px;",
+                onDOMMouseScroll: "uAutoPagerize.toggle();",
+                style: "padding: 0px;",
             });
         if (Config.isUrlbar) {
-            ns.icon = $('TabsToolbar').appendChild(button);
+            ns.icon = $('urlbar-icons').appendChild(button);
         } else {
             ToolbarManager.addWidget(window, button, false);
             ns.icon = button;
@@ -985,13 +986,12 @@ var ns = window.uAutoPagerize = {
             blacklistText.style.color = "red";
         }
     },
-    iconClick: function(event){
+    iconClick: function(event) {
         if (!event || !event.button) {
-            ns.toggle();
+            $('uAutoPagerize-popup').openPopup(ns.icon);
         } else if (event.button == 1) {
-            $('uAutoPagerize-popup').openPopupAtScreen(event.screenX, event.screenY, true);
-//            ns.loadSetting(true);
-//            ns.loadSetting_CN();
+            ns.loadSetting(true);
+            ns.loadSetting_CN();
         } else if (event.button == 2) {
 			ns.edit(ns.file);
 			event.preventDefault();
