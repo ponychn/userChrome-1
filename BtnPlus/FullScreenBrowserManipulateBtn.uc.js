@@ -45,8 +45,8 @@ location == "chrome://browser/content/browser.xul" && (function() {
 		background:#3665B3!important;\
 		}\
 		#FS-close:hover {opacity:0.8!important;}\
-		#FS-min:active, #FS-max:active {background:#3D6099!important;}\
-		#FS-close:active {opacity:0.9!important;}\
+		#FS-min:hover:active, #FS-max:hover:active {background:#3D6099!important;}\
+		#FS-close:hover:active {opacity:0.9!important;}\
 		#main-window[inFullscreen="true"] .titlebar-placeholder[type="caption-buttons"],\
 		#minimize-button,\
 		#restore-button,\
