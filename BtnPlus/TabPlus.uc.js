@@ -2,6 +2,7 @@
 // ==UserScript==
 // @name			NewTabPlus_mod
 // @description		整合版分頁增強
+// @homepageURL    https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/TabPlus.uc.js
 // @include			chrome://browser/content/browser.xul
 // @include			chrome://browser/content/bookmarks/bookmarksPanel.xul
 // @include			chrome://browser/content/history/history-panel.xul
@@ -33,7 +34,11 @@ location == "chrome://browser/content/browser.xul" && (function() {
 	gBrowser.mTabContainer.addEventListener('DOMMouseScroll', function(e) {
 		if (e.target.localName == "tab") {
 			if (e.detail > 0) {
-				gBrowser.removeAllTabsBut(gBrowser.mCurrentTab);
+//				gBrowser.removeAllTabsBut(gBrowser.mCurrentTab);
+				XULBrowserWindow.statusTextField.label = "關閉其他分頁";
+				var tabs = gBrowser.mTabContainer.childNodes;
+				for (var i = tabs.length - 1; tabs[i] != gBrowser.mCurrentTab; i--) {gBrowser.removeTab(tabs[i]);}
+				for (i--; i >= 0; i--) {gBrowser.removeTab(tabs[i]);}
 			}
 			else {
 				CloseRepeatedTabs();
@@ -57,7 +62,7 @@ location == "chrome://browser/content/browser.xul" && (function() {
 		}
 		else {
 			if (e.button == 2 && !e.ctrlKey) {
-				XULBrowserWindow.statusTextField.label = "貼上就瀏覽 / Google 加密搜尋 (新分頁前景) ";
+				XULBrowserWindow.statusTextField.label = "貼上就瀏覽 / Google 加密搜尋 (新分頁前景)";
 				var TXT = getBrowserSelection() || readFromClipboard();
 				(/^\s*(?:(?:(?:ht|f)tps?:\/\/)?(?:(?:\w+?)(?:\.(?:[\w-]+?))*(?:\.(?:[a-zA-Z]{2,5}))|(?:(?:\d+)(?:\.\d+){3}))(?::\d{2,5})?(?:\/\S*|$)|data:(text|image)\/[\u0025-\u007a]+)\s*$/.test(TXT) && (gBrowser.selectedTab = gBrowser.addTab(TXT))) || (gBrowser.selectedTab = gBrowser.addTab("https://encrypted.google.com/#q=" + encodeURIComponent(TXT)));
 				e.preventDefault();
@@ -107,11 +112,11 @@ location == "chrome://browser/content/browser.xul" && (function() {
 
 	// 自動關閉下載產生的空白分頁
 	eval("gBrowser.mTabProgressListener = " + gBrowser.mTabProgressListener.toString().replace(/(?=var location)/, '\
-      if (aWebProgress.DOMWindow.document.documentURI == "about:blank"\
-          && aRequest.QueryInterface(nsIChannel).URI.spec != "about:blank") {\
-        aWebProgress.DOMWindow.setTimeout(function() {\
-          !aWebProgress.isLoadingDocument && aWebProgress.DOMWindow.close();\
-        }, 100);\
-      }\
+	  if (aWebProgress.DOMWindow.document.documentURI == "about:blank"\
+		  && aRequest.QueryInterface(nsIChannel).URI.spec != "about:blank") {\
+		aWebProgress.DOMWindow.setTimeout(function() {\
+		  !aWebProgress.isLoadingDocument && aWebProgress.DOMWindow.close();\
+		}, 100);\
+	  }\
 	'));
 })();
