@@ -1,4 +1,9 @@
-(function() {
+// ==UserScript==
+// @name           AnotherBrowserBtn.uc.js
+// @homepageURL    https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/AnotherBrowserBtn.uc.js
+// ==/UserScript==
+
+location == "chrome://browser/content/browser.xul" && (function() {
 	AnotherBrowser = {
 		init: function() {
 			this.icon = $("TabsToolbar").appendChild($C("toolbarbutton", {
@@ -6,9 +11,9 @@
 				class: "toolbarbutton-1",
 				label: "另一個視窗",
 				tooltiptext: "左鍵：顯示 Index\n中鍵：顯示收藏庫\n右鍵：顯示 Website",
-				image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAArUlEQVQ4jc2TUQrDIBBE3wVMcoEk90iOmx5C/wO1f80FhNqL9CMDXYpCIIVWGFzX2dHVXYA7kIFk8AQ80ApePsvJiuUBTEAPjJpn4Cq7lz1/cCbFkuS0YwRWI7BWOOk/BLLyG+QctI5GIFY4GSCIsBrcgAvghEU+y4mKpTMnWTTmuk2F08H+z6VNZwRchdPCXiSlFJYDKfivPOLv6+C0wOlm2ii3c+DdzoFyO28vxlBcNJTkO0QAAAAASUVORK5CYII=",
+				image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAJUlEQVQ4jWNgoBL4jwMTK4/KwSJGSH64GEBRIA48GE0HQzodAABzd0+xt+fzuAAAAABJRU5ErkJggg==",
 				onclick: "AnotherBrowser.openPanel(event);",
-				style: "padding: 0px; -moz-transform: scale(0.875);",
+				style: "padding: 0px;",
 			}));
 
 			this.panel = $("mainPopupSet").appendChild($C("panel", {
@@ -32,16 +37,13 @@
 			}));
 		},
 		openPanel: function(event) {
-			var self = this,
-				panel = $("AnotherBrowser-panel"),
-				iframe = $("AnotherBrowser-iframe");
-			panel.openPopup(self.icon);
+			$("AnotherBrowser-panel").openPopup(this.icon);
 			var url = [
 				"chrome://userchromejs/content/index.html",
 				"chrome://browser/content/places/places.xul",
 				"chrome://userchromejs/content/Website.html"
 			];
-			iframe.contentDocument.location.href = url[event.button];
+			$("AnotherBrowser-iframe").contentDocument.location.href = url[event.button];
 			event.preventDefault();
 		},
 		addAutoPopup: function() {
