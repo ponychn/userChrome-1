@@ -545,7 +545,7 @@ var DISABLED = true;
 USL.__defineGetter__("disabled", function() DISABLED);
 USL.__defineSetter__("disabled", function(bool) {
 	var str = "油猴腳本管理器";
-	var dstr = "\n\n中鍵：重新加載\n右鍵：啟用 / 禁用";
+	var dstr = "\n\n左鍵：油猴腳本選單\n中鍵：重新加載已選腳本\n右鍵：啟用 / 禁用";
 	if (bool) {
 		this.icon.setAttribute("image", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAI6SURBVDhPhZPfS1NhGMe9E7yw6KaVYcNOa65tLjMda9VhxRoLz5aUghcZuygZtkVIDRl+xxARGUNkRMSIiOhihITEEBGRERFjSIzDkCHSRX9I5/voRstgBx7eX9/v533e93lPR0ebb9RnP62pzpER54WJ/r4z8XZ6WX945+qJkOq8q6muuG/YCrtyFlaziXGrLeDICMMMt7OvYYTL2ovAdduUQ+mJK4rS+V9QSB14SuOjsAp1yAKPS4F3UIHfY5MYsvWi32w632LWPI5LoRvOCUYiOolyaQ16ZQMf3ixKFmw55jzXG1r6BHTfd+VVakYTccNc293C3s9tFNfyRrsj/VplExUDQh319AlgbjqI/OJjPI+EZSeKV3NprKymsV/7jtzrBaOfakKoo54+AcwbtOWX41hKRsGd69UdxBIxWAYt+FWvNPv1aknWl5IzyM1Pgj4B3LvpiBPwNps8BOgldJu60XWqC78Pqs3+vv5NsqCOAPoEcPliz0DY55Lz7R0BssspZDNpAaxkF5Axxg1ApfQF1NMngEBA6WTZ9HIRW18/Ihzwwe8eRkQLIjY+hidjGoJeNx4E/dgufpJ74kU2S0lAowKJF9NYL+TlGLzAg9oPabn7+uc85majUqkWAEmjqmsqNRuRLFgunpWXyYtjK2U0jqeXN0Ad9S2P6fCHccVZosK7jKRZ290UE1vdgBbeZ6TU1FF/7CnzKOo1y+2g1/6MKf4bnOc6de1+qJOG4JwR5r+CY84f+/4AS9dVtRJZF3sAAAAASUVORK5CYII=");
 		this.icon.setAttribute("tooltiptext", str + "已禁用" + dstr);
@@ -656,7 +656,7 @@ USL.init = function() {
 										  type="checkbox"\
 										  checked="' + USL.ALLOW_NOTIFY + '"\
 										  oncommand="USL.ALLOW_NOTIFY = !USL.ALLOW_NOTIFY;" />\
-								<menuitem label="啟動/禁用腳本時自動刷新頁面"\
+								<menuitem label="啟動 / 禁用腳本時自動刷新頁面"\
 										  id="UserScriptLoader-auto-reload-page"\
 										  type="checkbox"\
 										  checked="' + USL.AUTO_RELOAD_PAGE + '"\
@@ -667,7 +667,7 @@ USL.init = function() {
 								  id="UserScriptLoader-openFolderMenu"\
 								  accesskey="O"\
 								  oncommand="USL.openFolder();" />\
-						<menuitem label="重載腳本"\
+						<menuitem label="重新加載所有腳本"\
 								  accesskey="R"\
 								  oncommand="USL.rebuild(); BrowserReloadSkipCache();" />\
 						<menuitem label="為本站搜索腳本"\
@@ -769,9 +769,9 @@ USL.observe = function (subject, topic, data) {
 			USL.isready = true;
 			USL.loadconfig();
 			//dannylee
-			$("showScripttoolsbutton").setAttribute("label", (this.ShowToolButton ? "油猴腳本版顯示為菜單" : "油猴腳本版顯示為按鈕"));
+			$("showScripttoolsbutton").setAttribute("label", "油猴腳本版顯示為" + (this.ShowToolButton ? "菜單" : "按鈕"));
 			USL.toggleUI(0);
-			Application.console.log("UserScriptLoader界面加載完畢！");
+			Application.console.log("UserScriptLoader 界面加載完畢！");
 		}
 	}
 	if (topic === "content-document-global-created") {
