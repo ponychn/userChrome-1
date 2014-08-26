@@ -113,7 +113,6 @@ window.UCL = {
 								   class="toolbarbutton-1 chromeclass-toolbar-additional" type="menu" \
 								   removable="true" \
 								   image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAARklEQVQ4jWNgYGD4TyFm+L/uaBJezMDA8H+vgyEGHk4GEIPxGnBhdikKZmBg+P/vEyscjxrASjglEmPAvBMPMPBwMoASDADElRSk+LLlQAAAAABJRU5ErkJggg=="\
-								   tooltiptext="用戶樣式管理器已啟用 (中鍵：重新加載 | 右鍵：啟用 / 禁用)"\
 								   onclick="UCL.iconClick(event);" >\
 						<menupopup id="usercssloader-menupopup"\
 								   onclick="event.preventDefault(); event.stopPropagation();" >\
@@ -124,12 +123,12 @@ window.UCL = {
 									  accesskey="R"\
 									  acceltext="Alt + R"\
 									  oncommand="UCL.rebuild();" />\
-							<menuitem label="userChrome.css"\
-									  tooltiptext="左鍵：重載 | 右鍵：編輯"\
+							<menuitem id="userChrome-item"\
+									  label="userChrome.css"\
 									  hidden="false"\
 									  onclick="UCL.userC(event,\'userChrome.css\');"/>\
-							<menuitem label="userContent.css"\
-									  tooltiptext="左鍵：重載 | 右鍵：編輯"\
+							<menuitem  id="userContent-item"\
+									  label="userContent.css"\
 									  hidden="false"\
 									  onclick="UCL.userC(event,\'userContent.css\');"/>\
 							<menuseparator />\
@@ -198,9 +197,9 @@ window.UCL = {
 				}
 				window.addEventListener("unload", this, false);
 				//dannylee
-				$("showCSStoolsbutton").setAttribute("label", (this.ShowToolButton ? "樣式管理器顯示為菜單" : "樣式管理器顯示為按鈕"));
+				$("showCSStoolsbutton").setAttribute("label", "樣式管理器顯示為" + (this.ShowToolButton ? "菜單" : "按鈕"));
 				UCL.toggleUI(0);
-				Application.console.log("UserCSSLoader界面加載完畢！");
+				Application.console.log("UserCSSLoader 界面加載完畢！");
 			}
 		}
 	},
@@ -245,7 +244,7 @@ window.UCL = {
 	},
 	enableUCL:function() {
 		var str = "用戶樣式管理器";
-		var dstr = "\n\n中鍵：重新加載\n右鍵：啟用 / 禁用";
+		var dstr = "\n\n左鍵：用戶樣式選單\n中鍵：重新加載已選樣式\n右鍵：啟用 / 禁用";
 		if (!UCL.UCLdisable) {
 			for (let [leafName, CSS] in Iterator(this.readCSS)) {
 				CSS.enabled = false;
@@ -496,7 +495,7 @@ window.UCL = {
 			s.authorStyleDisabled = !s.authorStyleDisabled;
 			s.authorStyleDisabled = !s.authorStyleDisabled;
 		}
-		XULBrowserWindow.statusTextField.label = "重新加載 "+str+" 已完成";
+		XULBrowserWindow.statusTextField.label = "重新加載 " + str + " 已完成";
 	},
 	getStyleSheet: function(aElement, cssURL) {
 		var rules = inIDOMUtils.getCSSStyleRules(aElement);
@@ -720,6 +719,11 @@ CSSTester.prototype = {
 };
 
 UCL.init();
+setTimeout(function() {
+	$("usercssloader-menu").setAttribute("tooltiptext", "用戶樣式管理器已啟用\n\n左鍵：用戶樣式選單\n中鍵：重新加載已選樣式\n右鍵：啟用 / 禁用");
+	$("userChrome-item").setAttribute("tooltiptext", "左鍵：重載\n右鍵：編輯");
+	$("userContent-item").setAttribute("tooltiptext", "左鍵：重載\n右鍵：編輯");
+}, 1000);
 
 function $(id) { return document.getElementById(id); }
 function $A(arr) Array.slice(arr);
