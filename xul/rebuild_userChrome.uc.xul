@@ -286,13 +286,16 @@
       var menuitem = $('userChrome_setting', {checked: !flag});
 
       var menupopup = $("userChromejs_options");
-      for(var i = 9, len = menupopup.childNodes.length; i <= len; i++) {
-        menupopup.removeChild(menupopup.lastChild);
+      // remove script menuitem
+      var nodes = menupopup.querySelectorAll('.userChromejs_script');
+      for(var i = 0, len = nodes.length; i < len; i++){
+        nodes[i].parentNode.removeChild(nodes[i]);
       }
 
-      var menuseparator = menupopup.appendChild($C('menuseparator'));
+     // var menuseparator = menupopup.appendChild($C('menuseparator', {class: 'userChromejs_script'}));
 
       menuitem = menupopup.appendChild($C('menuitem', {
+		class: 'userChromejs_script',
 		label: '啟用 / 禁用 chrome 下所有目錄',
 		tooltiptext: '囧rz\n危險動作！',
 		oncommand: 'userChromejs.chgDirStat("*");',
@@ -306,7 +309,7 @@
       let parentMenuPopup = menupopup,
           topMenuitems = [];
       let getTooltiptext = function(script, url) {
-        let text = '左鍵：啟用 / 禁用\n中鍵：打開主頁或下載鏈結\n右鍵：編輯\nCtrl + 中鍵：複選啟用 / 禁用\n\n' + '說明：' + script.description || '';
+        let text = '左鍵：啟用 / 禁用\n中鍵：打開主頁或下載鏈結\n右鍵：編輯\nCtrl + 中鍵：複選啟用 / 禁用\nCtrl + 右鍵：新建窗口並重載腳本\n\n' + '說明：' + script.description || '';
         if (url) {
           text += '\n' + '鏈結：' + url;
         }
@@ -333,6 +336,7 @@
         if(!flg) continue;
 
 		menu = $C('menu', {
+			class: 'userChromejs_script',
 			label: '腳本目錄 ' + (dirName=="root"?"":dirName) ,
 			onclick: 'if(event.button != 0) {event.stopPropagation();event.preventDefault();userChromejs.clickDirMenu(event);}'
 		});
@@ -356,7 +360,7 @@
           menuitem.setAttribute('hidden', true);
         }
 
-		menuseparator = menupopup.appendChild($C('menuseparator'));
+		var menuseparator = menupopup.appendChild($C('menuseparator'));
 
         var flg = false;
         for(var i = 0, len = userChrome_js.scripts.length; i < len; i++) {
@@ -380,6 +384,7 @@
 
             menuitem.script = script;
             if (dirName === 'root') {
+              menuitem.setAttribute('class','userChromejs_script');
               topMenuitems.push(menuitem);
             } else {
               menupopup.appendChild(menuitem);
@@ -409,6 +414,7 @@
 
             menuitem.script = script;
             if (dirName === 'root') {
+              menuitem.setAttribute('class','userChromejs_script');
               topMenuitems.push(menuitem);
             } else {
               menupopup.appendChild(menuitem);
@@ -452,7 +458,7 @@
     },
 
     clickScriptMenu: function(event) {
-      if(event.button==1) {
+      if(event.button == 1) {
         let script = event.target.script;
         if (event.ctrlKey) {
           userChromejs.chgScriptStat(script.filename);
@@ -463,8 +469,12 @@
             gBrowser.addTab(url);
           }
         }
-      }else if(event.button==2) {
-        userChromejs.launchEditor(event.target.script);
+      } else if(event.button == 2) {
+        if (event.ctrlKey) {
+          userChromejs.rebuild();
+        } else {
+          userChromejs.launchEditor(event.target.script);
+        }
       }
     },
 
@@ -676,7 +686,7 @@
   var userChromejsScriptOptionsMenu = {
     //あまり使わないメニューのリスト
     menues: [
-	'',
+	'wordhighlight-toolbar-menuitem',
     ],
 
     interval: 500, //0.5秒間隔
@@ -694,14 +704,14 @@
     },
 
     moveMenu: function() {
-      var menupopup = $('userChromejs_script_options');
+      var menupopup = $('userChromejs_options');
       if (!menupopup)
         return false;
       var i = 0;
       while (i < this.menues.length) {
         var menu = $(this.menues[i])
         if (menu) {
-          setTimeout(function(menupopup, menu) {menupopup.appendChild(menu);}, 100, menupopup, menu);
+          setTimeout(function(menupopup, menu) {menupopup.insertBefore(menu, $("uc-menuseparator"));}, 100, menupopup, menu);
           this.menues.splice(i, 1);
           continue;
         }
@@ -724,6 +734,7 @@
 			<menupopup id="userChromejs_options"
 					   onpopupshowing="userChromejs.onpopup();"
 					   context="">
+				<menuseparator id="uc-menuseparator"/>
 				<menuitem label="打開腳本目錄"
 						  id="userChromejs_openChromeFolder"
 						  tooltiptext="即 chrome 文件夾"
@@ -757,12 +768,6 @@
 						  class="menuitem-iconic"
 						  oncommand="userChromejs.toggleUI(1);"/>
 				<menuseparator/>
-				<menu label="userChromeJS用戶腳本命令..."
-					  id="userChromejs_script_options_Menu"
-					  accesskey="s"
-					  class="menu-iconic">
-					<menupopup id="userChromejs_script_options"/>
-				</menu>
 			</menupopup>
 		</toolbarbutton>
 	</toolbarpalette>
