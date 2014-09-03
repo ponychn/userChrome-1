@@ -373,7 +373,8 @@
 				onclick: 'if(event.button != 0) {event.stopPropagation();event.preventDefault();userChromejs.clickScriptMenu(event);}',
 				type: 'checkbox',
 				autocheck: 'false',
-				checked: !userChrome_js.scriptDisable[script.filename] 
+				checked: !userChrome_js.scriptDisable[script.filename] ,
+				class: 'uc-item'
 			}));
             let url = this.getScriptHomeURL(script);
             if (url)
@@ -403,7 +404,8 @@
 				onclick: 'if(event.button != 0) {event.stopPropagation();event.preventDefault();userChromejs.clickScriptMenu(event);}',
 				type: 'checkbox',
 				autocheck: 'false',
-				checked: !userChrome_js.scriptDisable[script.filename] 
+				checked: !userChrome_js.scriptDisable[script.filename] ,
+				class: 'uc-item'
 			}));
             let url = this.getScriptHomeURL(script);
             if (url)
@@ -431,7 +433,7 @@
         parentMenuPopup.appendChild(menuitem);
       });
 
-      $("showToolsMenu").setAttribute("label", "UC腳本管理器顯示為" + (userChromejs.ShowToolButton ? "菜單" : "按鈕"));
+      $("showToolsMenu").setAttribute("label", "UC腳本管理器顯示為" + (userChromejs.ShowToolButton ? "選單" : "按鈕"));
     },
 
     clickDirMenu: function(event) {
@@ -765,7 +767,7 @@
 								  accesskey="S"
 								  class="menuitem-iconic"
 								  oncommand="userChromejs.setEditor();"/>
-						<menuitem label="UC腳本管理器顯示為菜單"
+						<menuitem label="UC腳本管理器顯示為選單"
 								  id="showToolsMenu"
 								  accesskey="T"
 								  class="menuitem-iconic"
