@@ -92,7 +92,7 @@
 		//dannylee
 		var menuitem = $("menu_ToolsPopup").insertBefore($C("menu", {
 			id: "userChromejs_Tools_Menu",
-			label: "userChromeJS管理器",
+			label: "userChromeJS 管理器",
 			class: "menu-iconic",
 			image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACk0lEQVQ4ja3RW0hTARwG8A+nEIIxI9DwyQtCarKj7vhkWEwj8AKahNR6siAispce6k2y9VJvIblpkBOt4xGU5ko0RKZuecMLedlxTk0ym7Y5TcvL10OmKwuC+uB7/fG/AP8jarWaERERNBgMDxsbG4uMRuMdQRB4WH2MGdog0gvuuL+XbnDLDW66wQNAeXl5mSzLeUajsVQQhHW1+gjFtPgNn6d2Yl6pdM4rlc53U8/G/a4T/q2/A9RMS0tfXfR86ZpwLjgmnAuOMYU27/TZpe0/AQ0NDbkmk+nGPpC25vF47Iqi9CmK0jfh9PV4p7OWDwCRkZEsKysz1NfXF1VUVNzaA7TatSXvcs+Uy9WruFy9k9P+bt9M9vLO3C9AXFwcBUGgKIrMyMhgYmIij4aFMT05+fPk0NDAQGfn8LDNNjzUNdb/seekd90eAKiCwxkVFc2EhOPUaDTUiiLjYmKYAvAMwHyAJQDvAqwE2IwgOqDaB87nH2JRgbhaUFj8tbi4ePWiXv8pLyfHJwDMBli4C5QDNAG0AOxHwATcACcHr483NXeNWSyWPovV2tnUKPekAMwCeCk01HNPp7M8ysxsq9Hp2pp1urYOne71PjAPvum44jLXWTslSbJLsuyoNdf0pQA8BbBUo3FY7fZkyWrNrNutuaUl+zfAyy5Jeu4IBE4DvJaUNNTQ3p77RJb1JlnWV8qy/rEslfwEdLffdFY9dXSY617ZzPWtturqpr0VLoSE+G+npg4+EIRRo1Y7Kmm1o62i+HYP2JoBl8fD19+PxPs+jMSuLI7Grrjt0f6U3SOeA3gZoAFgFcAWgAOBR9x0g9szIGfBnVmQc+DqGPgDKAJ4FeB9gFXBwXyhUrFXFfDGf8k3RzmjBlDWo+YAAAAASUVORK5CYII="
 		}), $("menu_preferences"));
@@ -296,7 +296,7 @@
 
       menuitem = menupopup.appendChild($C('menuitem', {
 		class: 'userChromejs_script',
-		label: '啟用 / 禁用 chrome 下所有目錄',
+		label: '啟用 chrome 目錄下全部腳本',
 		tooltiptext: '囧rz\n危險動作！',
 		oncommand: 'userChromejs.chgDirStat("*");',
 		onclick: 'if(event.button != 0) {event.stopPropagation();event.preventDefault();userChromejs.clickDirMenuitem(event,true);}',
@@ -347,7 +347,7 @@
 		menupopup = $C('menupopup', {onpopupshowing: 'event.stopPropagation();'});
 
 		menuitem = menupopup.appendChild($C('menuitem', {
-			label: '是否啟用 ' + (dirName=="root"?"":dirName) + ' 目錄下全部腳本',
+			label: '啟用 ' + (dirName=="root"?"":dirName) + ' 目錄下全部腳本',
 			oncommand: 'userChromejs.chgDirStat(this.dirName);',
 			onclick: 'if(event.button != 0) {event.stopPropagation();event.preventDefault();userChromejs.clickDirMenuitem(event);}',
 			type: 'checkbox',
@@ -431,7 +431,7 @@
         parentMenuPopup.appendChild(menuitem);
       });
 
-      $("showToolsMenu").setAttribute("label", (userChromejs.ShowToolButton ? "UC腳本管理器顯示為菜單" : "UC腳本管理器顯示為按鈕"));
+      $("showToolsMenu").setAttribute("label", "UC腳本管理器顯示為" + (userChromejs.ShowToolButton ? "菜單" : "按鈕"));
     },
 
     clickDirMenu: function(event) {
@@ -686,7 +686,7 @@
   var userChromejsScriptOptionsMenu = {
     //あまり使わないメニューのリスト
     menues: [
-	'wordhighlight-toolbar-menuitem',
+	'',
     ],
 
     interval: 500, //0.5秒間隔
@@ -724,50 +724,55 @@
   ]]></script>
 	<toolbarpalette id="TabsToolbar">
 		<toolbarbutton id="userChromebtnMenu"
-					   label="userChromeJS管理器"
+					   label="userChromeJS 管理器"
+					   tooltiptext="userChromeJS 管理器"
+					   image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACk0lEQVQ4ja3RW0hTARwG8A+nEIIxI9DwyQtCarKj7vhkWEwj8AKahNR6siAispce6k2y9VJvIblpkBOt4xGU5ko0RKZuecMLedlxTk0ym7Y5TcvL10OmKwuC+uB7/fG/AP8jarWaERERNBgMDxsbG4uMRuMdQRB4WH2MGdog0gvuuL+XbnDLDW66wQNAeXl5mSzLeUajsVQQhHW1+gjFtPgNn6d2Yl6pdM4rlc53U8/G/a4T/q2/A9RMS0tfXfR86ZpwLjgmnAuOMYU27/TZpe0/AQ0NDbkmk+nGPpC25vF47Iqi9CmK0jfh9PV4p7OWDwCRkZEsKysz1NfXF1VUVNzaA7TatSXvcs+Uy9WruFy9k9P+bt9M9vLO3C9AXFwcBUGgKIrMyMhgYmIij4aFMT05+fPk0NDAQGfn8LDNNjzUNdb/seekd90eAKiCwxkVFc2EhOPUaDTUiiLjYmKYAvAMwHyAJQDvAqwE2IwgOqDaB87nH2JRgbhaUFj8tbi4ePWiXv8pLyfHJwDMBli4C5QDNAG0AOxHwATcACcHr483NXeNWSyWPovV2tnUKPekAMwCeCk01HNPp7M8ysxsq9Hp2pp1urYOne71PjAPvum44jLXWTslSbJLsuyoNdf0pQA8BbBUo3FY7fZkyWrNrNutuaUl+zfAyy5Jeu4IBE4DvJaUNNTQ3p77RJb1JlnWV8qy/rEslfwEdLffdFY9dXSY617ZzPWtturqpr0VLoSE+G+npg4+EIRRo1Y7Kmm1o62i+HYP2JoBl8fD19+PxPs+jMSuLI7Grrjt0f6U3SOeA3gZoAFgFcAWgAOBR9x0g9szIGfBnVmQc+DqGPgDKAJ4FeB9gFXBwXyhUrFXFfDGf8k3RzmjBlDWo+YAAAAASUVORK5CYII="
 					   class="toolbarbutton-1 chromeclass-toolbar-additional"
 					   type="menu"
 					   removable="true"
-					   image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACk0lEQVQ4ja3RW0hTARwG8A+nEIIxI9DwyQtCarKj7vhkWEwj8AKahNR6siAispce6k2y9VJvIblpkBOt4xGU5ko0RKZuecMLedlxTk0ym7Y5TcvL10OmKwuC+uB7/fG/AP8jarWaERERNBgMDxsbG4uMRuMdQRB4WH2MGdog0gvuuL+XbnDLDW66wQNAeXl5mSzLeUajsVQQhHW1+gjFtPgNn6d2Yl6pdM4rlc53U8/G/a4T/q2/A9RMS0tfXfR86ZpwLjgmnAuOMYU27/TZpe0/AQ0NDbkmk+nGPpC25vF47Iqi9CmK0jfh9PV4p7OWDwCRkZEsKysz1NfXF1VUVNzaA7TatSXvcs+Uy9WruFy9k9P+bt9M9vLO3C9AXFwcBUGgKIrMyMhgYmIij4aFMT05+fPk0NDAQGfn8LDNNjzUNdb/seekd90eAKiCwxkVFc2EhOPUaDTUiiLjYmKYAvAMwHyAJQDvAqwE2IwgOqDaB87nH2JRgbhaUFj8tbi4ePWiXv8pLyfHJwDMBli4C5QDNAG0AOxHwATcACcHr483NXeNWSyWPovV2tnUKPekAMwCeCk01HNPp7M8ysxsq9Hp2pp1urYOne71PjAPvum44jLXWTslSbJLsuyoNdf0pQA8BbBUo3FY7fZkyWrNrNutuaUl+zfAyy5Jeu4IBE4DvJaUNNTQ3p77RJb1JlnWV8qy/rEslfwEdLffdFY9dXSY617ZzPWtturqpr0VLoSE+G+npg4+EIRRo1Y7Kmm1o62i+HYP2JoBl8fD19+PxPs+jMSuLI7Grrjt0f6U3SOeA3gZoAFgFcAWgAOBR9x0g9szIGfBnVmQc+DqGPgDKAJ4FeB9gFXBwXyhUrFXFfDGf8k3RzmjBlDWo+YAAAAASUVORK5CYII="
-					   tooltiptext="userChromeJS管理器"
 					   popup="userChromejs_options">
 			<menupopup id="userChromejs_options"
 					   onpopupshowing="userChromejs.onpopup();"
 					   context="">
+				<menugroup id="uc-menugroup">
+					<menuitem label="新建窗口並重載腳本   "
+							  tooltiptext="僅選中的腳本"
+							  id="userChromejs_rebuild"
+							  class="menuitem-iconic"
+							  oncommand="userChromejs.rebuild();"/>
+					<menuitem tooltiptext="打開腳本目錄"
+							  image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABfElEQVQ4jc3M2yuDARzG8Z+7/RMo5da/wNiFkFIulBIXSgmlkCSHYmQmZMzGsDVtQ05Jhrxz2LIoucHeOcwONcbrkNO7eVzMYSn1vnee+lw+X6J/sVT58ZtU7kIsWSfrlMlPkgQFMjrYsGHrCsad66jta9SafLy0/Zj/HY5FRERpzTpJepsrMr4ZhH7rSjCp3IW0Zp2EMrtYZHaxyFJ86maR/UvOF6X7W3Z3FOX2uKFcDmHEdotRJoaN+5OW4aBYCiGv9xSU33+GPusN6sxB1JiEqTMH0Wu9QcHAGahw8ByqdQ6tcyFRBtZuUaS+AJVoPdBs3kG5womisd2jdNQDKhu7hN7+CI3tQRSD/RHlE15QpcGLqb1nTO4+iTK1/4xqow9Ua/Lz8wcvWDx8FWX+4AX1Fj9PTTOBhWGGe1894rHhCv+JYX+sHfFQM1ykZTZgpiqVI6Va69xvtPgjjdMBCNFg8YcrVA578ZAjmYgojojiiSiBiBIFSvj8xH0A+JJkUOT6edEAAAAASUVORK5CYII="
+							  id="userChromejs_openChromeFolder"
+							  class="menuitem-iconic"
+							  oncommand='userChromejs.Openchromedir();'
+							  style="max-width: 16px;"/>
+					<menuitem tooltiptext="重新啟動瀏覽器"
+							  image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB3klEQVQ4jY2Tv2tTURTHv+/dvCQ13Yo4iEgHcSgiUmxJ7rn38Rpb6dRBMkknBxEREcfSv6AgUuLQJu+dm3bSDBmKU+kURBwcnJwcxKFIEQcRKQ7HIUnzg/eww9m+38/53nPPgYh4k4Xt1UKxFUaBs4+DxDyDi+7hZfVSqnbSCEcbiM0JmGSsYvqrHLWLDTubCkB9YQas3w9N5lg5OlCO2nD0aQT2s+ii6hgAO/MBHHV7nSo/VJPWsTMfjHYq7dNNJOZdP82v/K6eOwMETE8H9DyXb6S9VUQ8vChPITFHYBI46oqIh9qbmgLrr2CSIDGPssyDmnplr4DpT08fLWJ6V8/1o//G1krpfwAR8ZSjds+jN5Hj6jKc/ZZrhYfnMYuI58dmE0zis2Gc1zQ2i1gPAQVevuY7ve87+1o5OoCjQ8VhZzpZvZj5BKZOf5AbyO1Fd8eXxhwPviitig07C66cgkmC5p1byHNYGwWoJFrLjL61UkKsuz2dORIRD8rZBxMre5J39v7kIgVJtIjEfBzsSyHW10XEg+/oOWL6coHD22DzYQjT35HYt2DqgO3n0QZwkT5LFewtraO+dHVwTH7WMXHl1He2hVb5cuY1jp9zNULTPkRsnqhGtIb6wkya9h9E7yW7D/Yw1AAAAABJRU5ErkJggg=="
+							  id="userChromejs_restartApp"
+							  class="menuitem-iconic"
+							  oncommand="userChromejs.restartApp();"
+							  style="max-width: 16px;"/>
+				</menugroup>
+				<menu label="管理選單">
+					<menupopup>
+						<menuitem label="新建窗口時是否重新加載腳本？"
+								  id="userChrome_setting"
+								  accesskey="U"
+								  oncommand="userChromejs.setting();"
+								  type="checkbox"/>
+						<menuitem label="設置全局腳本編輯器"
+								  id="userChromejs_setEditor"
+								  accesskey="S"
+								  class="menuitem-iconic"
+								  oncommand="userChromejs.setEditor();"/>
+						<menuitem label="UC腳本管理器顯示為菜單"
+								  id="showToolsMenu"
+								  accesskey="T"
+								  class="menuitem-iconic"
+								  oncommand="userChromejs.toggleUI(1);"/>
+					</menupopup>
+				</menu>
 				<menuseparator id="uc-menuseparator"/>
-				<menuitem label="打開腳本目錄"
-						  id="userChromejs_openChromeFolder"
-						  tooltiptext="即 chrome 文件夾"
-						  accesskey="o"
-						  class="menuitem-iconic"
-						  oncommand='userChromejs.Openchromedir();'/>
-				<menuitem label="新建窗口並重載腳本"
-						  id="userChromejs_rebuild"
-						  tooltiptext="僅重新載入選中的腳本"
-						  accesskey="x"
-						  class="menuitem-iconic"
-						  oncommand="userChromejs.rebuild();"/>
-				<menuitem label="新建窗口時是否重新加載腳本？"
-						  id="userChrome_setting"
-						  tooltiptext="僅重新載入選中的腳本"
-						  accesskey="u"
-						  oncommand="userChromejs.setting();"
-						  type="checkbox"/>
-				<menuitem label="重新啟動瀏覽器"
-						  id="userChromejs_restartApp"
-						  accesskey="r"
-						  class="menuitem-iconic"
-						  oncommand="userChromejs.restartApp();"/>
-				<menuitem label="設置全局腳本編輯器"
-						  id="userChromejs_setEditor"
-						  accesskey="s"
-						  class="menuitem-iconic"
-						  oncommand="userChromejs.setEditor();"/>
-				<menuitem label="UC腳本管理器顯示為菜單"
-						  id="showToolsMenu"
-						  class="menuitem-iconic"
-						  oncommand="userChromejs.toggleUI(1);"/>
-				<menuseparator/>
 			</menupopup>
 		</toolbarbutton>
 	</toolbarpalette>
