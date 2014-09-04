@@ -8,7 +8,7 @@
 // @version        0.1.8.2
 // @homepageURL    https://github.com/Griever/userChromeJS/blob/master/UserScriptLoader
 // @note           modified by ywzhaiqi: 修正@include 正則表達式的支持 2014.06.23
-// @note           2014/2/26 Mod by  dannylee修改可切換圖標和菜單模式
+// @note           2014/2/26 Mod by dannylee 新增可切換圖標和菜單模式
 // @note           0.1.8.2 Firefox 22 用の修正
 // @note           0.1.8.2 require が機能していないのを修正
 // @note           modified by lastdream2013: add switch: reload page on disable/enable script 2013.05.12
@@ -623,14 +623,24 @@ USL.init = function() {
 							   onpopuphidden="USL.onPopupHidden(event);"\
 							   onclick="USL.menuClick(event);">\
 						<menuseparator id="UserScriptLoader-menuseparator"/>\
-						<menu label="用戶腳本命令"\
-							  id="UserScriptLoader-register-menu"\
-							  accesskey="C">\
-							<menupopup id="UserScriptLoader-register-popup"/>\
-						</menu>\
-						<menu label="管理菜單" id="UserScriptLoader-submenu">\
+						<menuitem label="重新加載所有腳本"\
+								  tooltiptext="僅選中的腳本"\
+								  accesskey="R"\
+								  oncommand="USL.rebuild(); BrowserReloadSkipCache();" />\
+						<menu label="管理選單" id="UserScriptLoader-submenu">\
 							<menupopup id="UserScriptLoader-submenu-popup">\
-								<menuitem label="刪除系統pref預加載"\
+								<menuitem label="打開腳本目錄"\
+										  id="UserScriptLoader-openFolderMenu"\
+										  accesskey="O"\
+										  oncommand="USL.openFolder();" />\
+								<menuitem label="為本站搜索腳本"\
+										  id="UserScriptLoader-find-script"\
+										  oncommand="USL.findscripts();" />\
+								<menuitem label="保存當前頁面的腳本"\
+										  id="UserScriptLoader-saveMenu"\
+										  accesskey="S"\
+										  oncommand="USL.saveScript();"/>\
+								<menuitem label="刪除系統 pref 預加載"\
 										  oncommand="USL.deleteStorage(\'pref\');" />\
 								<menuseparator/>\
 								<menuitem label="隱藏未觸發腳本"\
@@ -656,30 +666,21 @@ USL.init = function() {
 										  type="checkbox"\
 										  checked="' + USL.ALLOW_NOTIFY + '"\
 										  oncommand="USL.ALLOW_NOTIFY = !USL.ALLOW_NOTIFY;" />\
-								<menuitem label="啟動 / 禁用腳本時自動刷新頁面"\
+								<menuitem label="啟用 / 禁用腳本時自動刷新頁面"\
 										  id="UserScriptLoader-auto-reload-page"\
 										  type="checkbox"\
 										  checked="' + USL.AUTO_RELOAD_PAGE + '"\
 										  oncommand="USL.AUTO_RELOAD_PAGE = !USL.AUTO_RELOAD_PAGE;" />\
+								<menuitem id="showScripttoolsbutton"\
+										  label="油猴腳本版顯示為按鈕"\
+										  oncommand="USL.toggleUI(1);" />\
 							</menupopup>\
 						</menu>\
-						<menuitem label="打開腳本目錄"\
-								  id="UserScriptLoader-openFolderMenu"\
-								  accesskey="O"\
-								  oncommand="USL.openFolder();" />\
-						<menuitem label="重新加載所有腳本"\
-								  accesskey="R"\
-								  oncommand="USL.rebuild(); BrowserReloadSkipCache();" />\
-						<menuitem label="為本站搜索腳本"\
-								  id="UserScriptLoader-find-script"\
-								  oncommand="USL.findscripts();" />\
-						<menuitem label="保存當前頁面的腳本"\
-								  id="UserScriptLoader-saveMenu"\
-								  accesskey="S"\
-								  oncommand="USL.saveScript();"/>\
-						<menuitem id="showScripttoolsbutton"\
-								  label="油猴腳本版顯示為按鈕"\
-								  oncommand="USL.toggleUI(1);" />\
+						<menu label="用戶腳本命令"\
+							  id="UserScriptLoader-register-menu"\
+							  accesskey="C">\
+							<menupopup id="UserScriptLoader-register-popup"/>\
+						</menu>\
 					</menupopup>\
 				</toolbarbutton>\
 			</toolbarpalette>\
@@ -769,7 +770,7 @@ USL.observe = function (subject, topic, data) {
 			USL.isready = true;
 			USL.loadconfig();
 			//dannylee
-			$("showScripttoolsbutton").setAttribute("label", "油猴腳本版顯示為" + (this.ShowToolButton ? "菜單" : "按鈕"));
+			$("showScripttoolsbutton").setAttribute("label", "油猴腳本版顯示為" + (this.ShowToolButton ? "選單" : "按鈕"));
 			USL.toggleUI(0);
 			Application.console.log("UserScriptLoader 界面加載完畢！");
 		}
@@ -796,7 +797,7 @@ USL.toggleUI = function(tag) {
 			$("showScripttoolsbutton").setAttribute("label", "油猴腳本版顯示為按鈕");
 		} else {
 			$("UserScriptLoader-icon").appendChild($("UserScriptLoader-popup"));
-			$("showScripttoolsbutton").setAttribute("label", "油猴腳本版顯示為菜單");
+			$("showScripttoolsbutton").setAttribute("label", "油猴腳本版顯示為選單");
 		}
 	}, 10);
 };
@@ -1357,4 +1358,18 @@ function addStyle(css) {
 	background-image: -moz-linear-gradient(rgba(242, 245, 249, 0.95), rgba(220, 223, 225, 0.67) 49%, rgba(198, 204, 208, 0.65) 51%, rgba(194, 197, 201, 0.3)) !important;\
 }\
 #UserScriptLoader-icon dropmarker{display: none !important;}\
+#UserScriptLoader-popup #UserScriptLoader-menuseparator {-moz-box-ordinal-group:95!important;}\
+#UserScriptLoader-popup .UserScriptLoader-item[checked="true"][style="font-weight: bold;"] {\
+-moz-box-ordinal-group:96!important;\
+color:blue!important;\
+}\
+#UserScriptLoader-popup .UserScriptLoader-item[checked="true"] {-moz-box-ordinal-group:97!important;}\
+#UserScriptLoader-popup .UserScriptLoader-item:not([checked="true"]) {\
+-moz-box-ordinal-group:98!important;\
+color:red!important;\
+}\
+#UserScriptLoader-popup .UserScriptLoader-item[checked="false"] {\
+-moz-box-ordinal-group:99!important;\
+color:gray!important;\
+}\
 '.replace(/[\r\n\t]/g, ''));
