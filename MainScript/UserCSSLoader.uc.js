@@ -9,10 +9,10 @@
 // @charset			UTF-8
 // @version			0.0.4
 // @homepageURL		https://github.com/Griever/userChromeJS/blob/master/UserCSSLoader
-// @note			2014/7/10 Mod by Oos 添加 CSS菜單 Ctrl + 中鍵複選啟用/停用, 按鈕中鍵重新加載和右鍵啟用 / 禁用
+// @note			2014/7/10 Mod by Oos 添加 CSS 選單 Ctrl + 中鍵複選啟用/停用, 按鈕中鍵重新加載和右鍵啟用 / 禁用 UserCSSLoader
 // @note			2014/7/10 Mod by feiruo 添加啟用/停用 UserCSSLoader
 // @note			2014/7/8 Mod by feiruo 添加重載 userChrome.css 和重載 userContent.css
-// @note			2014/2/26 Mod by dannylee 添加可切換圖標和菜單模式, CSS菜單中鍵重載
+// @note			2014/2/26 Mod by dannylee 添加可切換圖標和選單模式, CSS 選單中鍵重載
 // @note			0.0.4 Remove E4X
 // @note			CSSEntry クラスを作った
 // @note			スタイルのテスト機能を作り直した
@@ -22,10 +22,10 @@
 
 /****** 使用方法 ******
 
-在菜單「CSS-Stylish管理」菜單中：
+在選單「CSS-Stylish管理」選單中：
 左鍵點擊各 CSS 項目，切換各項目的「應用與否」；
 中鍵點擊各 CSS 項目，重新加載各項目;
-Ctrl + 中鍵點擊各 CSS 項目，也是切換各項目的「應用與否」，但不退出菜單，即可連續操作;
+Ctrl + 中鍵點擊各 CSS 項目，也是切換各項目的「應用與否」，但不退出選單，即可連續操作;
 右鍵點擊各 CSS 項目，則是調用編輯器對其進行編輯；
 
 userChrome.css 和 userContent.css
@@ -116,10 +116,8 @@ window.UCL = {
 								   onclick="UCL.iconClick(event);" >\
 						<menupopup id="usercssloader-menupopup"\
 								   onclick="event.preventDefault(); event.stopPropagation();" >\
-							<menuitem label="打開樣式目錄"\
-									  accesskey="O"\
-									  oncommand="UCL.openFolder();" />\
 							<menuitem label="重新加載全部樣式"\
+									  tooltiptext="僅選中的樣式"\
 									  accesskey="R"\
 									  acceltext="Alt + R"\
 									  oncommand="UCL.rebuild();" />\
@@ -131,30 +129,36 @@ window.UCL = {
 									  label="userContent.css"\
 									  hidden="false"\
 									  onclick="UCL.userC(event,\'userContent.css\');"/>\
-							<menuseparator />\
-							<menuitem label="編寫新樣式 (外部編輯器)"\
-									  accesskey="N"\
-									  oncommand="UCL.create();" />\
-							<menuitem label="編寫瀏覽器的樣式 (Chrome)"\
-									  id="usercssloader-test-chrome"\
-									  accesskey="C"\
-									  oncommand="UCL.styleTest(window);" />\
-							<menuitem label="編寫此網站的樣式 (Web)"\
-									  id="usercssloader-test-content"\
-									  accesskey="W"\
-									  oncommand="UCL.styleTest();" />\
-							<menuitem label="尋找此網站的樣式"\
-									  accesskey="F"\
-									  oncommand="UCL.searchStyle();" />\
-							<menu label=".uc.css" accesskey="U" hidden="'+ !UCL.USE_UC +'">\
-								<menupopup id="usercssloader-ucmenupopup">\
-									<menuitem label="Rebuild(.uc.js)"\
-											  oncommand="UCL.UCrebuild();" />\
-									<menuseparator id="usercssloader-ucsepalator"/>\
+							<menu label="管理選單">\
+								<menupopup>\
+									<menuitem label="打開樣式目錄"\
+											  accesskey="O"\
+											  oncommand="UCL.openFolder();" />\
+									<menuitem label="編寫新樣式 (外部編輯器)"\
+											  accesskey="N"\
+											  oncommand="UCL.create();" />\
+									<menuitem label="編寫瀏覽器的樣式 (Chrome)"\
+											  id="usercssloader-test-chrome"\
+											  accesskey="C"\
+											  oncommand="UCL.styleTest(window);" />\
+									<menuitem label="編寫此網站的樣式 (Web)"\
+											  id="usercssloader-test-content"\
+											  accesskey="W"\
+											  oncommand="UCL.styleTest();" />\
+									<menuitem label="尋找此網站的樣式"\
+											  accesskey="F"\
+											  oncommand="UCL.searchStyle();" />\
+									<menu label=".uc.css" accesskey="U" hidden="'+ !UCL.USE_UC +'">\
+										<menupopup id="usercssloader-ucmenupopup">\
+											<menuitem label="Rebuild(.uc.js)"\
+													  oncommand="UCL.UCrebuild();" />\
+											<menuseparator id="usercssloader-ucsepalator"/>\
+										</menupopup>\
+									</menu>\
+									<menuitem id="showCSStoolsbutton" label="樣式管理器顯示為按鈕"\
+											  oncommand="UCL.toggleUI(1);" />\
 								</menupopup>\
 							</menu>\
-							<menuitem id="showCSStoolsbutton" label="樣式管理器顯示為按鈕"\
-									  oncommand="UCL.toggleUI(1);" />\
 							<menuseparator id="ucl-sepalator"/>\
 						</menupopup>\
 					</toolbarbutton>\
@@ -197,7 +201,7 @@ window.UCL = {
 				}
 				window.addEventListener("unload", this, false);
 				//dannylee
-				$("showCSStoolsbutton").setAttribute("label", "樣式管理器顯示為" + (this.ShowToolButton ? "菜單" : "按鈕"));
+				$("showCSStoolsbutton").setAttribute("label", "樣式管理器顯示為" + (this.ShowToolButton ? "選單" : "按鈕"));
 				UCL.toggleUI(0);
 				Application.console.log("UserCSSLoader 界面加載完畢！");
 			}
@@ -218,7 +222,7 @@ window.UCL = {
 				$("showCSStoolsbutton").setAttribute("label", "樣式管理器顯示為按鈕");
 			} else {
 				$("usercssloader-menu").appendChild($("usercssloader-menupopup"));
-				$("showCSStoolsbutton").setAttribute("label", "樣式管理器顯示為菜單");
+				$("showCSStoolsbutton").setAttribute("label", "樣式管理器顯示為選單");
 			}
 		}, 10);
 	},
@@ -296,7 +300,7 @@ window.UCL = {
 		}
 		return CSS;
 	},
-//按鈕css列表子菜單start
+//按鈕css列表子選單start
 	rebuildMenu: function(aLeafName) {
 		var CSS = this.readCSS[aLeafName];
 		var menuitem = $("usercssloader-" + aLeafName);
@@ -321,7 +325,7 @@ window.UCL = {
 		}
 		menuitem.setAttribute("checked", CSS.enabled);
 	},
-//按鈕css列表子菜單end
+//按鈕css列表子選單end
 	toggle: function(aLeafName) {
 		var CSS = this.readCSS[aLeafName];
 		if (!CSS) return;
