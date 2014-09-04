@@ -7,10 +7,11 @@
 // @license        MIT License
 // @compatibility  Firefox 21
 // @charset        UTF-8
-// @version        2014.7.28
-// version         0.0.8
+// @version        2014.8.26
+// @version        0.0.9
 // @homepageURL    https://github.com/ywzhaiqi/userChromeJS/tree/master/addmenuPlus
-// @reviewURL      http://bbs.kafan.cn/thread-1554431-1-1.html
+// @reviewURL      https://github.com/Griever/userChromeJS/tree/master/addMenu
+// @note           0.0.9 Firefox 29 の Firefox Button 廃止に伴いファイルメニューに追加するように変更
 // @note           0.0.8 Firefox 25 の getShortcutOrURI 廃止に仮対応
 // @note           0.0.7 Firefox 21 の Favicon 周りの変更に対応
 // @note           0.0.6 Firefox 19 に合わせて修正
@@ -32,7 +33,7 @@
 
 ◆ 腳本說明 ◆
 通過配置文件自定義菜單
-在編寫的時候，參考了 Copy URL Lite+，得到作者允許。
+在編寫的時候，參考了 Copy URL Lite+，得到了作者允許。
 ・http://www.code-404.net/articles/browsers/copy-url-lite
 
 
@@ -126,6 +127,8 @@ PageMenu, TabMenu, ToolMenu, AppMenu 関數を使って自由に追加できま�
 
 (function(css){
 
+var enableFileRefreshing = true;  // 監視配置文件的變化
+
 let { classes: Cc, interfaces: Ci, utils: Cu, results: Cr } = Components;
 
 if (window.addMenu) {
@@ -150,11 +153,15 @@ window.addMenu = {
 		aFile = Services.dirsvc.get("UChrm", Ci.nsILocalFile);
 		aFile.appendRelativePath(path);
 
-		// initWidPath 相對路徑會錯誤
-		// if (!aFile.exists()) {
-		//     aFile = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile)
-		//     aFile.initWithPath(path);
-		// }
+		if (!aFile.exists()) {
+			saveFile(aFile, '// 這是一個 addMenuPlus 配置文件\n' +
+				'// 請到 http://ywzhaiqi.github.io/addMenu_creator/ 生成配置文件\n\n');
+			alert('目前 addMenuPlus 的配置文件為空，請在打開的鏈接中生成配置並放入配置文件');
+			var url = 'http://ywzhaiqi.github.io/addMenu_creator/';
+			openUILinkIn(url, 'tab', false, null);
+		}
+
+		this._modifiedTime = aFile.lastModifiedTime;
 
 		delete this.FILE;
 		return this.FILE = aFile;
@@ -210,12 +217,10 @@ window.addMenu = {
 		ins = $("prefSep") || $("webDeveloperMenu");
 		ins.parentNode.insertBefore(
 			$C("menuseparator", { id: "addMenu-tool-insertpoint", class: "addMenu-insert-point" }), ins.nextSibling);
-		ins = $("appmenu-quit");
-		if (ins) {
-			ins.parentNode.insertBefore(
-				$C("menuseparator", { id: "addMenu-app-insertpoint", class: "addMenu-insert-point" }), ins.nextSibling);
-		}
-		//ins = $("devToolsSeparator");
+		ins = $("appmenu-quit") || $("menu_FileQuitItem");
+		ins.parentNode.insertBefore(
+			$C("menuseparator", { id: "addMenu-app-insertpoint", class: "addMenu-insert-point" }), ins);
+		//ins = $('jscmdseparator') || $("devToolsSeparator");
 		//ins.parentNode.insertBefore($C("menuitem", {
 			//id: "addMenu-rebuild",
 			//label: "addMenuPlus",
@@ -225,11 +230,16 @@ window.addMenu = {
 		//}), ins);
 
 		$("contentAreaContextMenu").addEventListener("popupshowing", this, false);
+		$("tabContextMenu").addEventListener("popupshowing", this, false);
+		$("menu_ToolsPopup").addEventListener("popupshowing", this, false);
+
 		this.style = addStyle(css);
 		this.rebuild();
 	},
 	uninit: function() {
 		$("contentAreaContextMenu").removeEventListener("popupshowing", this, false);
+		$("tabContextMenu").removeEventListener("popupshowing", this, false);
+		$("menu_ToolsPopup").removeEventListener("popupshowing", this, false);
 	},
 	destroy: function() {
 		this.uninit();
@@ -242,23 +252,41 @@ window.addMenu = {
 		switch(event.type){
 			case "popupshowing":
 				if (event.target != event.currentTarget) return;
-				var state = [];
-				if (gContextMenu.onTextInput)
-					state.push("input");
-				if (gContextMenu.isContentSelected || gContextMenu.isTextSelected)
-					state.push("select");
-				if (gContextMenu.onLink)
-					state.push(gContextMenu.onMailtoLink ? "mailto" : "link");
-				if (gContextMenu.onCanvas)
-					state.push("canvas image");
-				if (gContextMenu.onImage)
-					state.push("image");
-				if (gContextMenu.onVideo || gContextMenu.onAudio)
-					state.push("media");
-				event.currentTarget.setAttribute("addMenu", state.join(" "));
+
+				if (event.target.id == 'contentAreaContextMenu') {
+					var state = [];
+					if (gContextMenu.onTextInput)
+						state.push("input");
+					if (gContextMenu.isContentSelected || gContextMenu.isTextSelected)
+						state.push("select");
+					if (gContextMenu.onLink)
+						state.push(gContextMenu.onMailtoLink ? "mailto" : "link");
+					if (gContextMenu.onCanvas)
+						state.push("canvas image");
+					if (gContextMenu.onImage)
+						state.push("image");
+					if (gContextMenu.onVideo || gContextMenu.onAudio)
+						state.push("media");
+					event.currentTarget.setAttribute("addMenu", state.join(" "));
+				}
+
+				if (enableFileRefreshing) {
+					this.updateModifiedFile();
+				}
 				break;
 		}
 	},
+
+	updateModifiedFile: function() {
+		if (!this.FILE.exists()) return;
+
+		if (this._modifiedTime != this.FILE.lastModifiedTime) {
+			this._modifiedTime = this.FILE.lastModifiedTime;
+
+			setTimeout(function(){ addMenu.rebuild(true); }, 10);
+		}
+	},
+
 	onCommand: function(event) {
 		var menuitem = event.target;
 		var text     = menuitem.getAttribute("text") || "";
@@ -302,9 +330,6 @@ window.addMenu = {
 	exec: function(path, arg){
 		var file    = Cc['@mozilla.org/file/local;1'].createInstance(Ci.nsILocalFile);
 		var process = Cc['@mozilla.org/process/util;1'].createInstance(Ci.nsIProcess);
-		var UI = Cc["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Ci.nsIScriptableUnicodeConverter);
-		UI.charset = window.navigator.platform.toLowerCase().indexOf("win") >= 0? "GBK": "UTF-8";
-
 		try {
 			var a;
 			if (typeof arg == 'string' || arg instanceof String) {
@@ -315,11 +340,6 @@ window.addMenu = {
 				a = [arg];
 			}
 
-			// 轉換每個參數的編碼
-			a.forEach(function(str, i){
-				a[i] = UI.ConvertFromUnicode(str);
-			});
-
 			file.initWithPath(path);
 			if (!file.exists()) {
 				Cu.reportError('File Not Found: ' + path);
@@ -328,11 +348,10 @@ window.addMenu = {
 
 			if (file.isExecutable()) {
 				process.init(file);
-				process.run(false, a, a.length);
+				process.runw(false, a, a.length);
 			} else {
 				file.launch();
 			}
-
 		} catch(e) {
 			this.log(e);
 		}
@@ -340,7 +359,7 @@ window.addMenu = {
 	handleRelativePath: function(path) {
 		if (path) {
 			path = path.replace(/\//g, '\\').toLocaleLowerCase();
-			var ffdir = Components.classes['@mozilla.org/file/directory_service;1'].getService(Components.interfaces.nsIProperties).get("ProfD", Components.interfaces.nsILocalFile).path;
+			var ffdir = Cc['@mozilla.org/file/directory_service;1'].getService(Components.interfaces.nsIProperties).get("ProfD", Components.interfaces.nsILocalFile).path;
 			if (/^(\\)/.test(path)) {
 				return ffdir + path;
 			}else{
@@ -589,7 +608,7 @@ window.addMenu = {
 					dupMenuitem = menuitem.cloneNode(true);
 
 					// 隱藏原菜單
-					menuitem.classList.add("addMenuHide");
+					// menuitem.classList.add("addMenuHide");
 				}else{
 					dupMenuitem = menuitem;
 				}
@@ -613,10 +632,10 @@ window.addMenu = {
 				if (!isDupMenu && !cls.contains('addMenuNot'))
 					cls.add('addMenuNot');
 
-				// 沒有插入位置的默認放在原來那個菜單的後面
-				if(isDupMenu && !obj.insertAfter && !obj.insertBefore && !obj.position){
-					obj.insertAfter = obj.id;
-				}
+				// // 沒有插入位置的默認放在原來那個菜單的後面
+				// if(isDupMenu && !obj.insertAfter && !obj.insertBefore && !obj.position){
+				//     obj.insertAfter = obj.id;
+				// }
 				let noMove = !isDupMenu;
 				insertMenuItem(obj, dupMenuitem, noMove);
 
@@ -649,7 +668,6 @@ window.addMenu = {
 			}
 		}
 	},
-
 	removeMenuitem: function() {
 		var remove = function(e) {
 			if (e.classList.contains('addMenuNot')) return;
@@ -872,10 +890,18 @@ window.addMenu = {
 		try {
 			editor = Services.prefs.getComplexValue("view_source.editor.path", Ci.nsILocalFile);
 		} catch(e) {}
+
 		if (!editor || !editor.exists()) {
-			alert("編輯器的路徑未設置!!!\n請設置 view_source.editor.path");
-			toOpenWindowByType('pref:pref', 'about:config?filter=view_source.editor');
-			return;
+			alert("請先設置編輯器的路徑!!!");
+			var fp = Cc['@mozilla.org/filepicker;1'].createInstance(Ci.nsIFilePicker);
+			fp.init(window, "設置全局腳本編輯器", fp.modeOpen);
+			fp.appendFilter("執行文件", "*.exe");
+			if (fp.show() == fp.returnCancel || !fp.file)
+				return;
+			else {
+				editor = fp.file;
+				Services.prefs.setCharPref("view_source.editor.path", editor.path);
+			}
 		}
 
 		// 調用自帶的
@@ -895,16 +921,13 @@ window.addMenu = {
 		XULBrowserWindow.statusTextField.label = "複製：" + aText;
 	},
 	alert: function (aMsg, aTitle, aCallback) {
-		if (aCallback)
-			var callback = {
-				observe : function (subject, topic, data) {
-					if ("alertclickcallback" != topic)
-						return;
-					aCallback.call(null);
-				}
-			};
-		else
-			callback = null;
+		var callback = aCallback ? {
+			observe : function (subject, topic, data) {
+				if ("alertclickcallback" != topic)
+					return;
+				aCallback.call(null);
+			}
+		} : null;
 		var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
 		alertsService.showAlertNotification(
 			"chrome://global/skin/icons/information-32.png", aTitle || "addMenu",
@@ -1056,6 +1079,24 @@ function getShortcutOrURI(aURL, aPostDataRef, aMayInheritPrincipal) {
   return [shortcutURL, aPostDataRef];
 }
 
+function saveFile(fileOrName, data) {
+	var file;
+	if(typeof fileOrName == "string"){
+		file = Services.dirsvc.get('UChrm', Ci.nsILocalFile);
+		file.appendRelativePath(fileOrName);
+	}else{
+		file = fileOrName;
+	}
+
+	var suConverter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Ci.nsIScriptableUnicodeConverter);
+	suConverter.charset = 'UTF-8';
+	data = suConverter.ConvertFromUnicode(data);
+
+	var foStream = Cc['@mozilla.org/network/file-output-stream;1'].createInstance(Ci.nsIFileOutputStream);
+	foStream.init(file, 0x02 | 0x08 | 0x20, 0664, 0);
+	foStream.write(data, data.length);
+	foStream.close();
+}
 
 })('\
 .addMenuHide\
