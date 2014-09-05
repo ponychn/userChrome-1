@@ -2,9 +2,12 @@
 Firefox 介面
 ==========
 按鈕模式<br>
+<img src="https://mozest.com/attachment/201409/5/100724_14099132044vuM.png">
 <img src="https://mozest.com/attachment/201408/11/100724_1407742327CYIc.png">
-工具選單模式 | 分頁右鍵選單<br>
-<img src="https://mozest.com/attachment/201408/23/100724_14087594340p99.png"><img src="https://mozest.com/attachment/201408/23/100724_1408759434J4WT.png">
+UC腳本管理器<br>
+<img src="https://mozest.com/attachment/201409/5/100724_1409911592AP1Y.png">
+工具選單 | 所有分頁選單<br>
+<img src="https://mozest.com/attachment/201409/5/100724_14099132044z29.png"><img src="http://fj.ikafan.com/attachment/forum/201409/02/183914knpllia1vbv5aoyl.png.thumb.jpg">
 UC 腳本整合帖
 ==========
 <b>UC 腳本參考和下載網址</b>
