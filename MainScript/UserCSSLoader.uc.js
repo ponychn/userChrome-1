@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name			UserCSSLoader
-// @description		類似Stylish的CSS樣式管理器 (Stylish みたいなもの)
+// @name			UserCSSLoader.uc.js
+// @description		類似 Stylish 的用戶樣式管理器 (Stylish みたいなもの)
 // @namespace		http://d.hatena.ne.jp/Griever/
 // @author			Griever
 // @include			main
@@ -39,7 +39,7 @@ userChrome.css 和 userContent.css
 
  **** 結束說明 ****/
 
-(function() {
+(function(css) {
 
 let { classes: Cc, interfaces: Ci, utils: Cu, results: Cr } = Components;
 if (!window.Services)
@@ -109,10 +109,11 @@ window.UCL = {
 			<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" \
 					 xmlns:html="http://www.w3.org/1999/xhtml"> \
 				<toolbarpalette id="TabsToolbar">\
-					<toolbarbutton id="usercssloader-menu" label="UC-Stylish" \
-								   class="toolbarbutton-1 chromeclass-toolbar-additional" type="menu" \
+					<toolbarbutton id="usercssloader-menu" \
+								   label="UserCSSLoader" \
+								   class="toolbarbutton-1" \
+								   type="menu" \
 								   removable="true" \
-								   image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAARklEQVQ4jWNgYGD4TyFm+L/uaBJezMDA8H+vgyEGHk4GEIPxGnBhdikKZmBg+P/vEyscjxrASjglEmPAvBMPMPBwMoASDADElRSk+LLlQAAAAABJRU5ErkJggg=="\
 								   onclick="UCL.iconClick(event);" >\
 						<menupopup id="usercssloader-menupopup"\
 								   onclick="event.preventDefault(); event.stopPropagation();" >\
@@ -155,7 +156,7 @@ window.UCL = {
 											<menuseparator id="usercssloader-ucsepalator"/>\
 										</menupopup>\
 									</menu>\
-									<menuitem id="showCSStoolsbutton" label="樣式管理器顯示為按鈕"\
+									<menuitem id="showCSStoolsbutton" label="用戶樣式管理器顯示為按鈕"\
 											  oncommand="UCL.toggleUI(1);" />\
 								</menupopup>\
 							</menu>\
@@ -166,13 +167,14 @@ window.UCL = {
 			</overlay>';
 	overlay = "data:application/vnd.mozilla.xul+xml;charset=utf-8," + encodeURI(overlay);
 	window.userChrome_js.loadOverlay(overlay, UCL);
+	UCL.style = addStyle(css);
 
 	//dannylee
 	var menuitem = $("menu_ToolsPopup").insertBefore($C("menu", {
 		id: "usercssloader_Tools_Menu",
 		label: "用戶樣式管理器腳本版",
 		class: "menu-iconic",
-		image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAARklEQVQ4jWNgYGD4TyFm+L/uaBJezMDA8H+vgyEGHk4GEIPxGnBhdikKZmBg+P/vEyscjxrASjglEmPAvBMPMPBwMoASDADElRSk+LLlQAAAAABJRU5ErkJggg=="
+		onclick: "UCL.iconClick(event);"
 	}), $("menu_preferences"));
 
 	//dannylee
@@ -201,7 +203,7 @@ window.UCL = {
 				}
 				window.addEventListener("unload", this, false);
 				//dannylee
-				$("showCSStoolsbutton").setAttribute("label", "樣式管理器顯示為" + (this.ShowToolButton ? "選單" : "按鈕"));
+				$("showCSStoolsbutton").setAttribute("label", "用戶樣式管理器顯示為" + (this.ShowToolButton ? "選單" : "按鈕"));
 				UCL.toggleUI(0);
 				Application.console.log("UserCSSLoader 界面加載完畢！");
 			}
@@ -219,10 +221,10 @@ window.UCL = {
 			$("usercssloader-menu").hidden = !UCL.ShowToolButton;
 			if (!UCL.ShowToolButton) {
 				$("usercssloader_Tools_Menu").appendChild($("usercssloader-menupopup"));
-				$("showCSStoolsbutton").setAttribute("label", "樣式管理器顯示為按鈕");
+				$("showCSStoolsbutton").setAttribute("label", "用戶樣式管理器顯示為按鈕");
 			} else {
 				$("usercssloader-menu").appendChild($("usercssloader-menupopup"));
-				$("showCSStoolsbutton").setAttribute("label", "樣式管理器顯示為選單");
+				$("showCSStoolsbutton").setAttribute("label", "用戶樣式管理器顯示為選單");
 			}
 		}, 10);
 	},
@@ -255,13 +257,17 @@ window.UCL = {
 				delete this.readCSS[leafName];
 			}
 			UCL.UCLdisable=!UCL.UCLdisable;
-			$("usercssloader-menu").setAttribute("image", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAARElEQVQ4je3SsQkAMAgAwd/V3RzAARzEZUwXCAEjpAsprv3qAfISaWYlIEVk81Kgowyo6gLIiJh+IM4ndgLuvnkpcGMAOeYtnkwr+88AAAAASUVORK5CYII=");
+			$("usercssloader_Tools_Menu").setAttribute("state", "disable");
+			$("usercssloader_Tools_Menu").setAttribute("tooltiptext", str + "已禁用" + dstr);
+			$("usercssloader-menu").setAttribute("state", "disable");
 			$("usercssloader-menu").setAttribute("tooltiptext", str + "已禁用" + dstr);
 			XULBrowserWindow.statusTextField.label = "UserCSSLoader 已禁用";
 		} else {
 			this.rebuild();
 			UCL.UCLdisable=!UCL.UCLdisable;
-			$("usercssloader-menu").setAttribute("image", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAARklEQVQ4jWNgYGD4TyFm+L/uaBJezMDA8H+vgyEGHk4GEIPxGnBhdikKZmBg+P/vEyscjxrASjglEmPAvBMPMPBwMoASDADElRSk+LLlQAAAAABJRU5ErkJggg==");
+			$("usercssloader_Tools_Menu").setAttribute("state", "enable");
+			$("usercssloader_Tools_Menu").setAttribute("tooltiptext", str + "已啟用" + dstr);
+			$("usercssloader-menu").setAttribute("state", "enable");
 			$("usercssloader-menu").setAttribute("tooltiptext", str + "已啟用" + dstr);
 			XULBrowserWindow.statusTextField.label = "UserCSSLoader 已啟用";
 		}
@@ -736,6 +742,30 @@ function $C(name, attr) {
 	if (attr) Object.keys(attr).forEach(function(n) el.setAttribute(n, attr[n]));
 	return el;
 }
-
+function addStyle(css) {
+	var pi = document.createProcessingInstruction(
+		'xml-stylesheet',
+		'type="text/css" href="data:text/css;utf-8,' + encodeURIComponent(css) + '"'
+	);
+	return document.insertBefore(pi, document.documentElement);
+}
 function log() { Application.console.log(Array.slice(arguments)); }
-})();
+})('\
+#usercssloader_Tools_Menu,\
+#usercssloader-menu {\
+	list-style-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAARklEQVQ4jWNgYGD4TyFm+L/uaBJezMDA8H+vgyEGHk4GEIPxGnBhdikKZmBg+P/vEyscjxrASjglEmPAvBMPMPBwMoASDADElRSk+LLlQAAAAABJRU5ErkJggg==);\
+}\
+#usercssloader_Tools_Menu[state="disable"],\
+#usercssloader-menu[state="disable"] {\
+	list-style-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAARElEQVQ4je3SsQkAMAgAwd/V3RzAARzEZUwXCAEjpAsprv3qAfISaWYlIEVk81Kgowyo6gLIiJh+IM4ndgLuvnkpcGMAOeYtnkwr+88AAAAASUVORK5CYII=);\
+}\
+#usercssloader-menu,\
+#usercssloader-menu > .toolbarbutton-icon {\
+	padding:0!important;\
+}\
+#usercssloader-menu dropmarker{display:none!important;}\
+#usercssloader-menupopup .usercssloader-item[checked="false"] {\
+	-moz-box-ordinal-group:99!important;\
+	color:gray!important;\
+}\
+'.replace(/[\r\n\t]/g, ''));
