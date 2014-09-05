@@ -5,7 +5,7 @@ Firefox 介面
 <img src="https://mozest.com/attachment/201409/5/100724_14099132044vuM.png">
 <img src="https://mozest.com/attachment/201408/11/100724_1407742327CYIc.png">
 UC腳本管理器<br>
-<img src="https://mozest.com/attachment/201409/5/100724_1409911592AP1Y.png">
+<img src="https://mozest.com/attachment/201409/5/100724_1409911592AP1Y.png"><br>
 工具選單 | 所有分頁選單<br>
 <img src="https://mozest.com/attachment/201409/5/100724_14099132044z29.png"><img src="http://fj.ikafan.com/attachment/forum/201409/02/183914knpllia1vbv5aoyl.png.thumb.jpg">
 UC 腳本整合帖
@@ -44,6 +44,7 @@ MainScript
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/MainScript/Extension%20Options%20Menu.uc.js">Extension Options Menu.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/MainScript/KeyChanger.uc.js">KeyChanger.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/MainScript/MouseGestures.uc.js">MouseGestures.uc.js</a><br></li>
+<li><a href="https://github.com/Drager-oos/userChrome/blob/master/MainScript/Redirector.uc.js">Redirector.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/MainScript/RefererChange.uc.js">RefererChange.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/MainScript/SuperDrag.uc.js">SuperDrag.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/MainScript/uAutoPagerize2.uc.js">uAutoPagerize2.uc.js</a><br></li>
@@ -52,7 +53,7 @@ MainScript
 </ol>
 <ol>
 SubScript
-<li><a href="https://github.com/Drager-oos/userChrome/blob/master/SubScript/FindNumber.uc.js">FindNumber.uc.js</a><br></li>
+<li><a href="https://github.com/Drager-oos/userChrome/blob/master/SubScript/ExtraFuctions.uc.js">ExtraFuctions.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/SubScript/LinkLocationbarLite.uc.js">LinkLocationbarLite.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/SubScript/LoadingBar.uc.js">LoadingBar.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/SubScript/RightClickLinkinNewTab.uc.js">RightClickLinkinNewTab.uc.js</a><br></li>
@@ -62,10 +63,10 @@ SubScript
 <ol>
 userBtn
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/AnotherBrowserBtn.uc.js">AnotherBrowserBtn.uc.js</a><br></li>
+<li><a href="https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/FullScreenBrowserManipulateBtn.uc.js">FullScreenBrowserManipulateBtn.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/OriginalBtnPlus.uc.js">OriginalBtnPlus.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/SearchbarBtnPlus.uc.js">SearchbarBtnPlus.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/StarBtnPlus.uc.js">StarBtnPlus.uc.js</a><br></li>
-<li><a href="https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/TabContextMenuBtn.uc.js">TabContextMenuBtn.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/TabPlus.uc.js">TabPlus.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/ToolsMenuBtn.uc.js">ToolsMenuBtn.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/WordHighlightToolbar.uc.js">WordHighlightToolbar.uc.js</a><br></li>
@@ -74,6 +75,7 @@ userBtn
 userMenu
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/userMenu/copybookmark.uc.js">copybookmark.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/userMenu/CopyMenuitemsToMenu.uc.js">CopyMenuitemsToMenu.uc.js</a><br></li>
+<li><a href="https://github.com/Drager-oos/userChrome/blob/master/userMenu/ExtensionsMenuitems.uc.js">ExtensionsMenuitems.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/userMenu/updatebookmarklite.uc.js">updatebookmarklite.uc.js</a><br></li>
 </ol>
 <ol>
@@ -90,9 +92,10 @@ xul
 <ol>
 <li><a href="http://bbs.kafan.cn/thread-1739599-1-1.html">代替AppMenu - 按鈕及選單取代法並結合addMenuPlus.uc.js使用</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1759163-1-1.html">FirefoxBtn.uc.js</a><br></li>
+<li><a href="http://bbs.kafan.cn/thread-1766451-1-1.html">FullScreenBrowserManipulateBtn.uc.js - 全屏瀏覽器控制按鈕</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1755436-1-1.html">Extension Options Menu.uc.js</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1754228-1-1.html">[修改發佈] rebuild_userChrome.uc.xul</a><br></li>
-<li><a href="http://bbs.kafan.cn/thread-1754182-1-1.html">[修改發佈] UserCSSLoader.uc.js & UserScriptLoader.uc.js</a><br></li>
+<li><a href="http://bbs.kafan.cn/thread-1754182-1-1.html">[修改發佈][UC腳本] UserCSSLoader, UserScriptLoader & Redirector</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1739617-1-1.html">[修改發佈] autoFocusSearchbar.uc.js</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1741525-1-1.html">SearchbarBtnPlus.uc.js</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1749331-1-1.html">autoSearchPopup.uc.js</a><br></li>
@@ -107,12 +110,16 @@ xul
 <li><a href="http://bbs.kafan.cn/thread-1750226-1-1.html">_addmenu.js - 搜索選單</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1752591-1-1.html">_addmenu.js - PreSuffixMenu</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1757983-1-1.html">_addmenu.js - 開啟測試配置</a><br></li>
+<li><a href="http://bbs.kafan.cn/thread-1767173-1-1.html">_addmenu.js - 以特定格式複製選擇範圍內的鏈接</a><br></li>
+<li><a href="http://bbs.kafan.cn/thread-1766620-1-1.html">_addmenu.js - 將所有標籤頁保存到書籤菜單 (以當前時間作為文件夾名稱)</a><br></li>
+<li><a href="http://bbs.kafan.cn/thread-1768925-1-1.html">善用 addMenuPlus.uc.js - 打造適合自己的菜單</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1743344-1-1.html">簡單的不可移動按鈕教程</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1743975-1-1.html">代碼 - 修改about:config中的特定值</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1754619-1-1.html">不需要重新啟動的擴展集合帖2014.7.14</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1756715-1-1.html">WordHighlightToolbar & 查找欄樣式分享</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1758572-1-1.html">標籤樣式分享</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1758660-1-1.html">側邊欄樣式分享</a><br></li>
+<li><a href="http://bbs.kafan.cn/thread-1769257-1-1.html">ColorDifferentiation.css - 顏色區分</a><br></li>
 </ol>
 ==========
 <b>Mozilla 社區</b>
