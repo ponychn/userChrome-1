@@ -3,10 +3,13 @@
 // @description    Greasemonkey っぽいもの
 // @namespace      http://d.hatena.ne.jp/Griever/
 // @include        main
-// @compatibility  Firefox 5.0
+// @compatibility  Firefox 32
 // @license        MIT License
-// @version        0.1.8.2
+// @version        0.1.8.3
 // @homepageURL    https://github.com/Griever/userChromeJS/blob/master/UserScriptLoader
+// @note           0.1.8.3 Firefox 32 で GM_xmlhttpRequest が動かないのを修正
+// @note           0.1.8.3 內臓の console を利用するようにした
+// @note           0.1.8.3 obsever を使わないようにした
 // @note           modified by ywzhaiqi: 修正@include 正則表達式的支持 2014.06.23
 // @note           2014/2/26 Mod by dannylee 新增可切換圖標和菜單模式
 // @note           0.1.8.2 Firefox 22 用の修正
@@ -143,6 +146,7 @@ USL.ScriptEntry.prototype = {
 		} else if (this.run_at === "document-idle") {
 			this.delay = 0;
 		}
+
 		if (this.metadata.match) {
 			this.includeRegExp = this.createRegExp(this.metadata.match, true);
 			this.includeTLD = this.isTLD(this.metadata.match);
@@ -293,26 +297,6 @@ USL.ScriptEntry.prototype = {
 	},
 };
 
-USL.Console = function Console() {};
-USL.Console.prototype = {
-	__exposedProps__: {
-		log: "r",
-		dir: "r",
-		time: "r",
-		timeEnd: "r",
-	},
-	log: function(str) { Application.console.log(str); },
-	dir: function(obj) { window.inspectObject? inspectObject(obj): this.log(obj); },
-	time: function(name) { this['_' + name] = new Date().getTime(); },
-	timeEnd: function(name) {
-		if (typeof this['_' + name] == 'undefined')
-			return this.log('timeEnd: Error' + name);
-		this.log(name + ':' + (new Date().getTime() - this['_' + name]));
-		delete this['_' + name];
-	},
-	__noSuchMethod__: function(id, args) { this.log('console.' + id + ' is not function'); }
-};
-
 USL.API = function(script, sandbox, win, doc) {
 	var self = this;
 
@@ -337,7 +321,7 @@ USL.API = function(script, sandbox, win, doc) {
 		alertsService.showAlertNotification(
 			aIconURL || "chrome://global/skin/icons/information-32.png", aTitle || "UserScriptLoader-notification", aMsg + "", !!callback, "", callback);
 	};
-	
+
 	this.GM_xmlhttpRequest = function(obj) {
 		if(typeof(obj) != 'object' || (typeof(obj.url) != 'string' && !(obj.url instanceof String))) return;
 
@@ -347,8 +331,10 @@ USL.API = function(script, sandbox, win, doc) {
 		req.open(obj.method || 'GET',obj.url,true);
 		if(typeof(obj.headers) == 'object') for(var i in obj.headers) req.setRequestHeader(i,obj.headers[i]);
 		['onload','onerror','onreadystatechange'].forEach(function(k) {
-			if(obj[k] && (typeof(obj[k]) == 'function' || obj[k] instanceof Function)) req[k] = function() {
-				obj[k]({
+			// thx! script uploader
+			let obj_k = (obj.wrappedJSObject) ? new XPCNativeWrapper(obj.wrappedJSObject[k]) : obj[k];
+			if(obj_k && (typeof(obj_k) == 'function' || obj_k instanceof Function)) req[k] = function() {
+				obj_k({
 					__exposedProps__: {
 						status: "r",
 						statusText: "r",
@@ -483,7 +469,6 @@ USL.readScripts = [];
 USL.USE_STORAGE_NAME = ['cache', 'cacheInfo'];
 USL.initialized = false;
 USL.isready = false;
-USL.eventName = "USL_DocumentStart" + Math.random();
 
 USL.__defineGetter__("pref", function() {
 	delete this.pref;
@@ -547,13 +532,17 @@ USL.__defineSetter__("disabled", function(bool) {
 	var str = "油猴腳本管理器";
 	var dstr = "\n\n左鍵：油猴腳本選單\n中鍵：重新加載已選腳本\n右鍵：啟用 / 禁用";
 	if (bool) {
-		this.icon.setAttribute("image", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAI6SURBVDhPhZPfS1NhGMe9E7yw6KaVYcNOa65tLjMda9VhxRoLz5aUghcZuygZtkVIDRl+xxARGUNkRMSIiOhihITEEBGRERFjSIzDkCHSRX9I5/voRstgBx7eX9/v533e93lPR0ebb9RnP62pzpER54WJ/r4z8XZ6WX945+qJkOq8q6muuG/YCrtyFlaziXGrLeDICMMMt7OvYYTL2ovAdduUQ+mJK4rS+V9QSB14SuOjsAp1yAKPS4F3UIHfY5MYsvWi32w632LWPI5LoRvOCUYiOolyaQ16ZQMf3ixKFmw55jzXG1r6BHTfd+VVakYTccNc293C3s9tFNfyRrsj/VplExUDQh319AlgbjqI/OJjPI+EZSeKV3NprKymsV/7jtzrBaOfakKoo54+AcwbtOWX41hKRsGd69UdxBIxWAYt+FWvNPv1aknWl5IzyM1Pgj4B3LvpiBPwNps8BOgldJu60XWqC78Pqs3+vv5NsqCOAPoEcPliz0DY55Lz7R0BssspZDNpAaxkF5Axxg1ApfQF1NMngEBA6WTZ9HIRW18/Ihzwwe8eRkQLIjY+hidjGoJeNx4E/dgufpJ74kU2S0lAowKJF9NYL+TlGLzAg9oPabn7+uc85majUqkWAEmjqmsqNRuRLFgunpWXyYtjK2U0jqeXN0Ad9S2P6fCHccVZosK7jKRZ290UE1vdgBbeZ6TU1FF/7CnzKOo1y+2g1/6MKf4bnOc6de1+qJOG4JwR5r+CY84f+/4AS9dVtRJZF3sAAAAASUVORK5CYII=");
+		$('UserScriptLoader_Tools_Menu').setAttribute("tooltiptext", str + "已禁用");
+		$('UserScriptLoader_Tools_Menu').setAttribute("state", "disable");
 		this.icon.setAttribute("tooltiptext", str + "已禁用" + dstr);
-		gBrowser.mPanelContainer.removeEventListener(USL.eventName, this, false);
+		this.icon.setAttribute("state", "disable");
+		gBrowser.mPanelContainer.removeEventListener("DOMWindowCreated", this, false);
 	} else {
-		this.icon.setAttribute("image", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAIzSURBVDhPhVNNSFRRFD5LdxqtSxkj4gUZg4TmT0/HqGhhZTsXU5laiGhUDP5OpRlBNeZPY5HdMjKTcnBRRptp51KthaBOd4yidi1n+XXOeY06GMyFw7n3nO/73nn3nEuUZXVXUVGvS231BygW8JHNhtd8VxXlMynCZlsOEY7tIbgFauGsAkIMuwQx/mqaiNp9hGulFD9RSLbGR7n/FWLyghAjdTvQXEwIHiQ0+AlXD3tW56jgkQxyTwXV9lRSTOx1+36kFvuAlQdYeFGvVYiXs8Qln8YKT4U6Azl/xlv9Clby6iCQeAR8ewI7d109ElGOD3G+X3GCF54KDF/yY3bgJExTIYMiCjZT52EmGoH1VzBvmnh/gYUec/6h4gQvPE+gtQyToTLM9VUCayOAfQq3zUVeeR7wY2Zzb41WJri34QCEpwIXK3ZaEZiPnvJKTz4H7SXQLgJ+fdzcr09oFfPR0yogPBU47qNgZ3UOUku3NwTM6GWY0Xbg9yeY6BWYkRb+nZcqkFoagOCFpwKhGsqVtmHlPga7zuDL+5vA90ku/x3wc5Zths9T+PrhFoa6z2pH5CI3WikC6Q4k471oOFqEoLMb/SUOxkod3GXf6OSjmePJzze0UxkCosQDFI91FLP6PW0XEmN6mbDP2Ma9DsgFc5WCE3zGMP17MFZatDx9zmvn2rBHEs+zsTzNreW8vA/Bbxtl+RUe3zuhclpNv4WtXuKaZ1y2B1XAgBI2d4vJWeLb1l8Iw62jtqs6OwAAAABJRU5ErkJggg==");
+		$('UserScriptLoader_Tools_Menu').setAttribute("tooltiptext", str + "已啟用");
+		$('UserScriptLoader_Tools_Menu').setAttribute("state", "enable");
 		this.icon.setAttribute("tooltiptext", str + "已啟用" + dstr);
-		gBrowser.mPanelContainer.addEventListener(USL.eventName, this, false);
+		this.icon.setAttribute("state", "enable");
+		gBrowser.mPanelContainer.addEventListener("DOMWindowCreated", this, false);
 	}
 	return DISABLED = bool;
 });
@@ -614,10 +603,12 @@ USL.init = function() {
 		<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" \
 				 xmlns:html="http://www.w3.org/1999/xhtml"> \
 			<toolbarpalette id="TabsToolbar">\
-				<toolbarbutton id="UserScriptLoader-icon" label="UserScriptLoader" \
-							   class="toolbarbutton-1" type="menu" \
-							   onclick="USL.iconClick(event);"  removable="true" \
-							   image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAIzSURBVDhPhVNNSFRRFD5LdxqtSxkj4gUZg4TmT0/HqGhhZTsXU5laiGhUDP5OpRlBNeZPY5HdMjKTcnBRRptp51KthaBOd4yidi1n+XXOeY06GMyFw7n3nO/73nn3nEuUZXVXUVGvS231BygW8JHNhtd8VxXlMynCZlsOEY7tIbgFauGsAkIMuwQx/mqaiNp9hGulFD9RSLbGR7n/FWLyghAjdTvQXEwIHiQ0+AlXD3tW56jgkQxyTwXV9lRSTOx1+36kFvuAlQdYeFGvVYiXs8Qln8YKT4U6Azl/xlv9Clby6iCQeAR8ewI7d109ElGOD3G+X3GCF54KDF/yY3bgJExTIYMiCjZT52EmGoH1VzBvmnh/gYUec/6h4gQvPE+gtQyToTLM9VUCayOAfQq3zUVeeR7wY2Zzb41WJri34QCEpwIXK3ZaEZiPnvJKTz4H7SXQLgJ+fdzcr09oFfPR0yogPBU47qNgZ3UOUku3NwTM6GWY0Xbg9yeY6BWYkRb+nZcqkFoagOCFpwKhGsqVtmHlPga7zuDL+5vA90ku/x3wc5Zths9T+PrhFoa6z2pH5CI3WikC6Q4k471oOFqEoLMb/SUOxkod3GXf6OSjmePJzze0UxkCosQDFI91FLP6PW0XEmN6mbDP2Ma9DsgFc5WCE3zGMP17MFZatDx9zmvn2rBHEs+zsTzNreW8vA/Bbxtl+RUe3zuhclpNv4WtXuKaZ1y2B1XAgBI2d4vJWeLb1l8Iw62jtqs6OwAAAABJRU5ErkJggg==" >\
+				<toolbarbutton id="UserScriptLoader-icon" \
+							   label="UserScriptLoader" \
+							   class="toolbarbutton-1" \
+							   type="menu" \
+							   onclick="USL.iconClick(event);" \
+							   removable="true" >\
 					<menupopup id="UserScriptLoader-popup" \
 							   onpopupshowing="USL.onPopupShowing(event);"\
 							   onpopuphidden="USL.onPopupHidden(event);"\
@@ -694,7 +685,6 @@ USL.init = function() {
 		id: "UserScriptLoader_Tools_Menu",
 		label: "油猴腳本管理器腳本版",
 		class: "menu-iconic",
-		image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAIzSURBVDhPhVNNSFRRFD5LdxqtSxkj4gUZg4TmT0/HqGhhZTsXU5laiGhUDP5OpRlBNeZPY5HdMjKTcnBRRptp51KthaBOd4yidi1n+XXOeY06GMyFw7n3nO/73nn3nEuUZXVXUVGvS231BygW8JHNhtd8VxXlMynCZlsOEY7tIbgFauGsAkIMuwQx/mqaiNp9hGulFD9RSLbGR7n/FWLyghAjdTvQXEwIHiQ0+AlXD3tW56jgkQxyTwXV9lRSTOx1+36kFvuAlQdYeFGvVYiXs8Qln8YKT4U6Azl/xlv9Clby6iCQeAR8ewI7d109ElGOD3G+X3GCF54KDF/yY3bgJExTIYMiCjZT52EmGoH1VzBvmnh/gYUec/6h4gQvPE+gtQyToTLM9VUCayOAfQq3zUVeeR7wY2Zzb41WJri34QCEpwIXK3ZaEZiPnvJKTz4H7SXQLgJ+fdzcr09oFfPR0yogPBU47qNgZ3UOUku3NwTM6GWY0Xbg9yeY6BWYkRb+nZcqkFoagOCFpwKhGsqVtmHlPga7zuDL+5vA90ku/x3wc5Zths9T+PrhFoa6z2pH5CI3WikC6Q4k471oOFqEoLMb/SUOxkod3GXf6OSjmePJzze0UxkCosQDFI91FLP6PW0XEmN6mbDP2Ma9DsgFc5WCE3zGMP17MFZatDx9zmvn2rBHEs+zsTzNreW8vA/Bbxtl+RUe3zuhclpNv4WtXuKaZ1y2B1XAgBI2d4vJWeLb1l8Iw62jtqs6OwAAAABJRU5ErkJggg=="
 	}), $("menu_preferences"));
 
 	//dannylee
@@ -715,22 +705,16 @@ USL.loadconfig = function () {
 	USL.rebuild();
 	USL.disabled = USL.pref.getValue('disabled', false);
 	window.addEventListener('unload', USL, false);
-	Services.obs.addObserver(USL, "content-document-global-created", false);
-	USL.debug('observer start');
 	USL.initialized = true;
 };
 
 USL.uninit = function () {
 	window.removeEventListener('unload', USL, false);
-	Services.obs.removeObserver(USL, "content-document-global-created");
-	USL.debug('observer end');
 	USL.saveSetting();
 };
 
 USL.destroy = function () {
 	window.removeEventListener('unload', USL, false);
-	Services.obs.removeObserver(USL, "content-document-global-created");
-	USL.log('observer end');
 
 	let disabledScripts = [x.leafName for each(x in USL.readScripts) if (x.disabled)];
 	USL.pref.setValue('script.disabled', disabledScripts.join('|'));
@@ -738,7 +722,7 @@ USL.destroy = function () {
 	USL.pref.setValue('HIDE_EXCLUDE', USL.HIDE_EXCLUDE);
 	USL.pref.setValue('ALLOW_NOTIFY', USL.ALLOW_NOTIFY);
 	USL.pref.setValue('AUTO_RELOAD_PAGE', USL.AUTO_RELOAD_PAGE);
-	
+
 	var e = $("UserScriptLoader-icon");
 	if (e) e.parentNode.removeChild(e);
 	var e = $("UserScriptLoader-popup");
@@ -749,7 +733,7 @@ USL.destroy = function () {
 
 USL.handleEvent = function (event) {
 	switch(event.type) {
-		case USL.eventName:
+		case "DOMWindowCreated":
 			var win = event.target.defaultView;
 			win.USL_registerCommands = {};
 			win.USL_run = [];
@@ -774,12 +758,6 @@ USL.observe = function (subject, topic, data) {
 			USL.toggleUI(0);
 			Application.console.log("UserScriptLoader 界面加載完畢！");
 		}
-	}
-	if (topic === "content-document-global-created") {
-		var doc = subject.document;
-		var evt = doc.createEvent("Events");
-		evt.initEvent(USL.eventName, true, false);
-		doc.dispatchEvent(evt);
 	}
 };
 
@@ -1050,18 +1028,17 @@ USL.injectScripts = function(safeWindow, rsflag) {
 	var locationHref = safeWindow.location.href;
 
 	// document-start でフレームを開いた際にちょっとおかしいので…
-	if (!rsflag && locationHref == "" && safeWindow.frameElement)
+	if (!rsflag && locationHref == ""/* && safeWindow.frameElement*/)
 		return USL.retryInject(safeWindow);
-	// target="_blank" で about:blank 狀態で開かれるので…
+/*	// target="_blank" で about:blank 狀態で開かれるので…
 	if (!rsflag && locationHref == 'about:blank')
-		return USL.retryInject(safeWindow);
+		return USL.retryInject(safeWindow);*/
 
 	if (USL.GLOBAL_EXCLUDES_REGEXP.test(locationHref)) return;
 
 	if (!USL.CACHE_SCRIPT)
 		USL.reloadScripts();
 
-	var console = new USL.Console();
 	var documentEnds = [];
 	var windowLoads = [];
 
@@ -1075,7 +1052,7 @@ USL.injectScripts = function(safeWindow, rsflag) {
 
 		safeWindow.USL_match.push(script);
 		if (script.disabled) return false;
-		
+
 		if (script.run_at === "document-start") {
 			"delay" in script ? safeWindow.setTimeout(run, script.delay, script) : run(script)
 		} else if (script.run_at === "window-load") {
@@ -1119,7 +1096,7 @@ USL.injectScripts = function(safeWindow, rsflag) {
 		sandbox.XPathResult  = Ci.nsIDOMXPathResult;
 		sandbox.unsafeWindow = safeWindow.wrappedJSObject;
 		sandbox.document     = safeWindow.document;
-		sandbox.console      = console;
+		sandbox.console      = safeWindow.console;
 		sandbox.window       = safeWindow;
 
 		sandbox.__proto__ = safeWindow;
@@ -1138,19 +1115,15 @@ USL.evalInSandbox = function(aScript, aSandbox) {
 	}
 };
 
-USL.log = function() {
-	Services.console.logStringMessage("[USL] " + Array.slice(arguments));
-};
+USL.log = console.log.bind(console);
 
 USL.debug = function() {
-	if (USL.DEBUG) Services.console.logStringMessage('[USL DEBUG] ' + Array.slice(arguments));
+	if (!USL.DEBUG) return;
+	var arr = ['[USL DEBUG]'].concat(Array.from(arguments));
+	console.log.apply(console, arr);
 };
 
-USL.error = function() {
-	var err = Cc["@mozilla.org/scripterror;1"].createInstance(Ci.nsIScriptError);
-	err.init(Array.slice(arguments), null, null, null, null, err.errorFlag, null);
-	Services.console.logMessage(err);
-};
+USL.error = console.error.bind(console);
 
 USL.loadText = function(aFile) {
 	var fstream = Cc["@mozilla.org/network/file-input-stream;1"].createInstance(Ci.nsIFileInputStream);
@@ -1333,43 +1306,32 @@ function addStyle(css) {
 	return document.insertBefore(pi, document.documentElement);
 }
 })('\
+#UserScriptLoader_Tools_Menu,\
 #UserScriptLoader-icon {\
-	-moz-appearance: none !important;\
-	border-style: none !important;\
-	border-radius: 0 !important;\
-	padding: 0 2px !important;\
-	margin: 0 !important;\
-	background: transparent !important;\
-	box-shadow: none !important;\
-	-moz-box-align: center !important;\
-	-moz-box-pack: center !important;\
-	min-width: 18px !important;\
-	min-height: 18px !important;\
+	list-style-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAIzSURBVDhPhVNNSFRRFD5LdxqtSxkj4gUZg4TmT0/HqGhhZTsXU5laiGhUDP5OpRlBNeZPY5HdMjKTcnBRRptp51KthaBOd4yidi1n+XXOeY06GMyFw7n3nO/73nn3nEuUZXVXUVGvS231BygW8JHNhtd8VxXlMynCZlsOEY7tIbgFauGsAkIMuwQx/mqaiNp9hGulFD9RSLbGR7n/FWLyghAjdTvQXEwIHiQ0+AlXD3tW56jgkQxyTwXV9lRSTOx1+36kFvuAlQdYeFGvVYiXs8Qln8YKT4U6Azl/xlv9Clby6iCQeAR8ewI7d109ElGOD3G+X3GCF54KDF/yY3bgJExTIYMiCjZT52EmGoH1VzBvmnh/gYUec/6h4gQvPE+gtQyToTLM9VUCayOAfQq3zUVeeR7wY2Zzb41WJri34QCEpwIXK3ZaEZiPnvJKTz4H7SXQLgJ+fdzcr09oFfPR0yogPBU47qNgZ3UOUku3NwTM6GWY0Xbg9yeY6BWYkRb+nZcqkFoagOCFpwKhGsqVtmHlPga7zuDL+5vA90ku/x3wc5Zths9T+PrhFoa6z2pH5CI3WikC6Q4k471oOFqEoLMb/SUOxkod3GXf6OSjmePJzze0UxkCosQDFI91FLP6PW0XEmN6mbDP2Ma9DsgFc5WCE3zGMP17MFZatDx9zmvn2rBHEs+zsTzNreW8vA/Bbxtl+RUe3zuhclpNv4WtXuKaZ1y2B1XAgBI2d4vJWeLb1l8Iw62jtqs6OwAAAABJRU5ErkJggg==);\
 }\
+#UserScriptLoader_Tools_Menu[state="disable"],\
+#UserScriptLoader-icon[state="disable"] {\
+	list-style-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAI6SURBVDhPhZPfS1NhGMe9E7yw6KaVYcNOa65tLjMda9VhxRoLz5aUghcZuygZtkVIDRl+xxARGUNkRMSIiOhihITEEBGRERFjSIzDkCHSRX9I5/voRstgBx7eX9/v533e93lPR0ebb9RnP62pzpER54WJ/r4z8XZ6WX945+qJkOq8q6muuG/YCrtyFlaziXGrLeDICMMMt7OvYYTL2ovAdduUQ+mJK4rS+V9QSB14SuOjsAp1yAKPS4F3UIHfY5MYsvWi32w632LWPI5LoRvOCUYiOolyaQ16ZQMf3ixKFmw55jzXG1r6BHTfd+VVakYTccNc293C3s9tFNfyRrsj/VplExUDQh319AlgbjqI/OJjPI+EZSeKV3NprKymsV/7jtzrBaOfakKoo54+AcwbtOWX41hKRsGd69UdxBIxWAYt+FWvNPv1aknWl5IzyM1Pgj4B3LvpiBPwNps8BOgldJu60XWqC78Pqs3+vv5NsqCOAPoEcPliz0DY55Lz7R0BssspZDNpAaxkF5Axxg1ApfQF1NMngEBA6WTZ9HIRW18/Ihzwwe8eRkQLIjY+hidjGoJeNx4E/dgufpJ74kU2S0lAowKJF9NYL+TlGLzAg9oPabn7+uc85majUqkWAEmjqmsqNRuRLFgunpWXyYtjK2U0jqeXN0Ad9S2P6fCHccVZosK7jKRZ290UE1vdgBbeZ6TU1FF/7CnzKOo1y+2g1/6MKf4bnOc6de1+qJOG4JwR5r+CY84f+/4AS9dVtRJZF3sAAAAASUVORK5CYII=);\
+}\
+#UserScriptLoader-icon,\
 #UserScriptLoader-icon > .toolbarbutton-icon {\
-	max-width: 18px !important;\
-	padding: 0 !important;\
-	margin: 0 !important;\
+	padding:0!important;\
 }\
-#UserScriptLoader-icon:not([disabled="true"]):hover,\
-#UserScriptLoader-icon:not([disabled="true"])[type="menu-button"]:hover,\
-#UserScriptLoader-icon:not([disabled="true"])[open="true"],\
-#UserScriptLoader-icon:not([disabled="true"])[type="menu-button"][open="true"] {\
-	background-image: -moz-linear-gradient(rgba(242, 245, 249, 0.95), rgba(220, 223, 225, 0.67) 49%, rgba(198, 204, 208, 0.65) 51%, rgba(194, 197, 201, 0.3)) !important;\
-}\
-#UserScriptLoader-icon dropmarker{display: none !important;}\
+#UserScriptLoader-icon dropmarker{display:none!important;}\
+\
 #UserScriptLoader-popup #UserScriptLoader-menuseparator {-moz-box-ordinal-group:95!important;}\
 #UserScriptLoader-popup .UserScriptLoader-item[checked="true"][style="font-weight: bold;"] {\
--moz-box-ordinal-group:96!important;\
-color:blue!important;\
+	-moz-box-ordinal-group:96!important;\
+	color:blue!important;\
 }\
 #UserScriptLoader-popup .UserScriptLoader-item[checked="true"] {-moz-box-ordinal-group:97!important;}\
 #UserScriptLoader-popup .UserScriptLoader-item:not([checked="true"]) {\
--moz-box-ordinal-group:98!important;\
-color:red!important;\
+	-moz-box-ordinal-group:98!important;\
+	color:red!important;\
 }\
 #UserScriptLoader-popup .UserScriptLoader-item[checked="false"] {\
--moz-box-ordinal-group:99!important;\
-color:gray!important;\
+	-moz-box-ordinal-group:99!important;\
+	color:gray!important;\
 }\
 '.replace(/[\r\n\t]/g, ''));
