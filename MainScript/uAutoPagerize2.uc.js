@@ -1,15 +1,17 @@
 // ==UserScript==
-// @name           uAutoPagerize 中文規則增強簡化版
+// @name           uAutoPagerize2
 // @namespace      http://d.hatena.ne.jp/Griever/
-// @description    在同一個頁面自動加載下一頁
+// @description    自動翻頁，中文規則增強改進版
 // @include        main
 // @modified       ywzhaiqi
 // @compatibility  Firefox 17
 // @charset        UTF-8
-// @version        2014.8.9
+// @version        2014.9.8
 // version        0.3.0
+// @startup        window.uAutoPagerize.init();
+// @shutdown       window.uAutoPagerize.destroy();
 // @homepageURL    https://github.com/ywzhaiqi/userChromeJS/tree/master/uAutoPagerize2
-// @reviewURL      http://bbs.kafan.cn/thread-1555846-1-1.html
+// @reviewURL      https://github.com/Griever/userChromeJS/tree/master/uAutoPagerize
 // @optionsURL     about:config?filter=uAutoPagerize.
 // @note           0.3.0 本家に倣って Cookie の處理を変更した
 // @note           0.2.9 remove E4X
@@ -109,8 +111,8 @@ var SITEINFO_IMPORT_URLS = Config.ORIGINAL_SITEINFO ? [
     ] : [];
 
 // Super_preloaderPlus 規則更新地址
-var SITEINFO_CN_IMPORT_URL = "https://greasyfork.org/scripts/293-super-preloaderplus-one/code/Super_preloaderPlus_one.user.js";
-// var SITEINFO_CN_IMPORT_URL = "https://github.com/ywzhaiqi/userscript/raw/master/Super_preloaderPlus/super_preloaderplus_one.user.js";
+// var SITEINFO_CN_IMPORT_URL = "https://greasyfork.org/scripts/293-super-preloaderplus-one/code/Super_preloaderPlus_one.user.js";
+var SITEINFO_CN_IMPORT_URL = "https://github.com/ywzhaiqi/userscript/raw/master/Super_preloaderPlus/super_preloaderplus_one.user.js";
 
 var COLOR = {
     on: '#0f0',
@@ -445,10 +447,9 @@ var ns = window.uAutoPagerize = {
                 tooltiptext: "disable",
                 onclick: "uAutoPagerize.iconClick(event);",
                 onDOMMouseScroll: "uAutoPagerize.toggle();",
-                style: "padding: 0px;",
             });
         if (Config.isUrlbar) {
-            ns.icon = $('urlbar-icons').appendChild(button);
+            ns.icon = $('TabsToolbar').appendChild(button);
         } else {
             ToolbarManager.addWidget(window, button, false);
 
@@ -467,7 +468,7 @@ var ns = window.uAutoPagerize = {
                 <menuitem label="重新載入配置"\
                           oncommand="uAutoPagerize.loadSetting(true); uAutoPagerize.loadSetting_CN();"/>\
                 <menuitem label="編輯配置和中文規則"\
-                          oncommand="uAutoPagerize.edit(uAutoPagerize.file); uAutoPagerize.edit(uAutoPagerize.file_CN, true);"/>\
+                          oncommand="uAutoPagerize.edit(uAutoPagerize.file); uAutoPagerize.edit(uAutoPagerize.file_CN, null, true);"/>\
                 <menuitem label="更新中文規則" \
                           tooltiptext="包含 Super_preloader 的中文規則"\
                           oncommand="uAutoPagerize.resetSITEINFO_CN();"/>\
@@ -627,7 +628,18 @@ var ns = window.uAutoPagerize = {
         window.addEventListener('uAutoPagerize_destroy', this, false);
         window.addEventListener('unload', this, false);
 
+        // uc 腳本會因為打開新窗口而重複註冊
+        var mediator = Cc["@mozilla.org/appshell/window-mediator;1"]
+                       .getService(Ci.nsIWindowMediator);
+        var enumerator = mediator.getEnumerator("navigator:browser");
+        while (enumerator.hasMoreElements()) {
+            var win = enumerator.getNext();
+            if (win.uAutoPagerize && win.uAutoPagerize.registerDone) {
+                return;
+            }
+        }
         ns.prefs.addObserver('', this, false);
+        ns.registerDone = true;
     },
     removeListener: function() {
         gBrowser.mPanelContainer.removeEventListener('DOMContentLoaded', this, true);
@@ -636,7 +648,10 @@ var ns = window.uAutoPagerize = {
         window.removeEventListener('uAutoPagerize_destroy', this, false);
         window.removeEventListener('unload', this, false);
 
-        ns.prefs.removeObserver('', this, false);
+        if (ns.registerDone) {
+            ns.prefs.removeObserver('', this, false);
+            ns.registerDone = false;
+        }
     },
     handleEvent: function(event) {
         switch(event.type) {
@@ -724,8 +739,12 @@ var ns = window.uAutoPagerize = {
         // if (sandbox.EXCLUDE)
         //  ns.EXCLUDE = sandbox.EXCLUDE;
 
-        if (sandbox.prefs)
-            prefs = sandbox.prefs;
+        var newPrefs = sandbox.prefs;
+        if (newPrefs) {
+            Object.keys(newPrefs).forEach(function(key){
+                prefs[key] = newPrefs[key];
+            });
+        }
         if (sandbox.HashchangeSites)
             ns.HashchangeSites = sandbox.HashchangeSites;
 
@@ -1113,7 +1132,7 @@ var ns = window.uAutoPagerize = {
                     <caption label="一般設置" />\
                     <checkbox label="檢測配置文件是否被修改" tooltiptext="會在每一個頁面載入時檢測"\
                         preference="monitorUserFile" />\
-                    <hbox tooltiptext="相對於 Chrome 目錄，諸如 （空白）、Local。\n需要重啟生效">\
+                    <hbox tooltiptext="相對於 Chrome 目錄，諸如 （空白）、Local、Local\\js。\n需要重啟生效">\
                         <label value="數據庫文件夾："/>\
                         <textbox preference="DB_FOLDER" />\
                     </hbox>\
@@ -1573,6 +1592,11 @@ AutoPager.prototype = {
     scroll : function(){
         if (this.state !== 'enable' || !ns.AUTO_START) return;
         var remain = this.getScrollHeight() - this.win.innerHeight - this.win.scrollY;
+
+        // 可能高度會發生變化，所以每次都重新設置
+        // 但在 https://www.firefox.net.cn/thread-4 又會由於 id("J_posts_list") 只能找到一個，無法準確得到最後一個，所以會不斷加載。
+        // this.setRemainHeight();
+
         if (remain < this.remainHeight || this.ipagesMode) {
             if(this.tmpDoc) {
                 this.load(this.tmpDoc);
@@ -1789,7 +1813,7 @@ AutoPager.prototype = {
         // if (!ns.SCROLL_ONLY)
         //  this.scroll();
         if (!url) {
-            this.C.error('[uAutoPagerize] nextLink not found.', this.info.nextLink);
+            debug('nextLink not found.', this.info.nextLink);
             this.state = 'terminated';
         }
 
@@ -2887,13 +2911,13 @@ function loadText(aFile) {
     return data;
 }
 
-function saveFile(name, data) {
+function saveFile(fileOrName, data) {
     var file;
-    if(typeof name == "string"){
-        var file = Services.dirsvc.get('UChrm', Ci.nsILocalFile);
-        file.appendRelativePath(name);
+    if(typeof fileOrName == "string"){
+        file = Services.dirsvc.get('UChrm', Ci.nsILocalFile);
+        file.appendRelativePath(fileOrName);
     }else{
-        file = name;
+        file = fileOrName;
     }
 
     var suConverter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Ci.nsIScriptableUnicodeConverter);
@@ -2905,8 +2929,36 @@ function saveFile(name, data) {
     foStream.write(data, data.length);
     foStream.close();
 }
+setTimeout(function() {
+	var uAPPhideDelay;
+	$("uAutoPagerize-icon").addEventListener('mouseover', function() {
+		$('uAutoPagerize-popup').openPopup($('uAutoPagerize-icon'));
+		if (uAPPhideDelay) {
+			clearTimeout(uAPPhideDelay);
+			uAPPhideDelay = null;
+		}
+	}, false);
 
+	$('uAutoPagerize-icon').addEventListener('mouseout', function() {
+		uAPPhideDelay = setTimeout(function() {$('uAutoPagerize-popup').hidePopup();}, 500);
+	}, false);
+
+	$('uAutoPagerize-popup').addEventListener('mouseover', function() {
+		if (uAPPhideDelay) {
+			clearTimeout(uAPPhideDelay);
+			uAPPhideDelay = null;
+		}
+	}, false);
+
+	$('uAutoPagerize-popup').addEventListener('mouseout', function() {
+		uAPPhideDelay = setTimeout(function() {$('uAutoPagerize-popup').hidePopup();}, 500);
+	}, false);
+}, 10000);
 })('\
+#uAutoPagerize-icon,\
+#uAutoPagerize-icon > .toolbarbutton-icon {\
+	padding:0!important;\
+}\
 #uAutoPagerize-icon {\
 	list-style-image: url(\
 		data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAQCAYAAACBSfjBAAAA2klEQVRYhe\
