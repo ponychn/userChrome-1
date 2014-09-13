@@ -8,6 +8,8 @@
 		tooltiptext: "左鍵：所有分頁選單",
 		style: "padding: 0px;"
 	}));
+	var ATsPopup = $("alltabs-popup", {onclick: 'event.preventDefault(); event.stopPropagation();'});
+		ATsPopup.addEventListener("mouseover", function (event) {event.originalTarget.setAttribute('closemenu', 'none')}, true);
 
 	$("urlbar").appendChild($("PanelUI-button", {
 		tooltiptext: "左鍵：開啟選單\n中鍵：新建窗口並重載腳本\n右鍵：窗口占用屏幕右下半部分\n向上滾動：隱藏Firefox\n向下滾動：清除startupCache並重新啟動瀏覽器",
@@ -23,7 +25,7 @@
 		else {HideFirefox();}\
 		return;\
 		",
-		onmouseover: "UCL.rebuild(); USL.rebuild(); ucjsMouseGestures.reload(true); addMenu.rebuild(true); uAutoPagerize.loadSetting(true); uAutoPagerize.loadSetting_CN(); KeyChanger.makeKeyset(true); Redirector.reload(); refererChanger.reload(true);",
+		onmouseover: "UCL.rebuild(); USL.rebuild(); ucjsMouseGestures.reload(true); addMenu.rebuild(true); uAutoPagerize.loadSetting(true); uAutoPagerize.loadSetting_CN(); KeyChanger.makeKeyset(true); Redirector.reload(); refererChanger.reload(true); ASP.rebuild(true);",
 		style: "margin: 0px -4px 0px -2px;"
 	}));
 
@@ -42,35 +44,23 @@
 
 //	document.querySelector("#nav-bar").removeAttribute("overflowable");
 
+	setTimeout(function() {
+//		$('AnotherBrowser').click();
+		$('UserMenu-popup').openPopup($('UserMenu-button'), null, 0, 20, false, null, null);
+		addMenu.rebuild(true);
+	}, 2000);
+
 	function DelayStart() {
+/********************************************************************* Buttons *********************************************************************/
 		$("editBookmarkPanel", {position: "after_start"});
 
-		$('AnotherBrowser').click();
-
-		$("redirector-icon", {
-			onmouseover: "document.getElementById('downloadsPanel').hidePopup();",
-		});
+		$("UserMenu-button", {onmouseover: "document.getElementById('downloadsPanel').hidePopup();",});
 
 //		$("urlbar-icons").appendChild($("clipple-statusbar-icon"));
-
-		$("abp-menuitem", {class: "menu-iconic"});
-
-		$("abp-toolbarbutton", {
-			tooltiptext: "左鍵：Adblock Plus 選單\n中鍵：啟用 / 停用 Adblock Plus\n右鍵：Adblock Plus 條件偏好設定",
-			onclick: "if (event.button == 2) {gBrowser.selectedTab = gBrowser.addTab('chrome://adblockplus/content/ui/filters.xul'); event.preventDefault();}"
-		});
-
-		$("abp-toolbar-popup", {onclick: "if (event.button == 2) {event.stopPropagation();}"});
-
-		$("noscript-tbb", {
-//			tooltiptext: "左鍵：NoScript 選單\n中鍵：暫時允許此頁面的所有物件\n右鍵：取消暫時許可",
-			onclick: "if (event.button == 2) {noscriptOverlay.revokeTemp(); event.preventDefault();}"
-		});
 
 		$("urlbar-reload-button", {
 			tooltiptext: "左鍵：重新載入此分頁\n滾動：重新載入所有分頁\n\n在復原分頁選單：\n右鍵：清除復原分頁列表",
 			onDOMMouseScroll: "gBrowser.reloadAllTabs();",
-			onmouseover: "document.getElementById('undoCloseTabPopup').openPopupAtScreen(event.screenX, event.screenY, true);",
 		});
 
 		$("urlbar-stop-button", {
@@ -78,13 +68,17 @@
 			onDOMMouseScroll: "Array.map(gBrowser.browsers, function(browser) {browser.stop()});",
 		});
 
-		var uCTPhideDelay, BFMhideDelay, uAPPhideDelay;
+		var uCTPhideDelay, BFMhideDelay;
 
-		$('urlbar-reload-button').addEventListener('mouseout', function() {
-			uCTPhideDelay = setTimeout(function() {$('undoCloseTabPopup').hidePopup();}, 500);
+		$("urlbar-reload-button").addEventListener('mouseover', function(event) {
+			$('undoCloseTabPopup').openPopupAtScreen(event.screenX, event.screenY, true);
+			if (uCTPhideDelay) {
+				clearTimeout(uCTPhideDelay);
+				uCTPhideDelay = null;
+			}
 		}, false);
 
-		$('undoCloseTabPopup').addEventListener('mouseout', function() {
+		$('urlbar-reload-button').addEventListener('mouseout', function() {
 			uCTPhideDelay = setTimeout(function() {$('undoCloseTabPopup').hidePopup();}, 500);
 		}, false);
 
@@ -95,15 +89,19 @@
 			}
 		}, false);
 
-		$("back-button", {
-			onmouseover: "document.getElementById('backForwardMenu').openPopupAtScreen(event.screenX, event.screenY, true);",
-		});
-
-		$('back-button').addEventListener('mouseout', function() {
-			BFMhideDelay = setTimeout(function() {$('backForwardMenu').hidePopup();}, 500);
+		$('undoCloseTabPopup').addEventListener('mouseout', function() {
+			uCTPhideDelay = setTimeout(function() {$('undoCloseTabPopup').hidePopup();}, 500);
 		}, false);
 
-		$('backForwardMenu').addEventListener('mouseout', function() {
+		$("back-button").addEventListener('mouseover', function(event) {
+			$('backForwardMenu').openPopupAtScreen(event.screenX, event.screenY, true);
+			if (BFMhideDelay) {
+				clearTimeout(BFMhideDelay);
+				BFMhideDelay = null;
+			}
+		}, false);
+
+		$('back-button').addEventListener('mouseout', function() {
 			BFMhideDelay = setTimeout(function() {$('backForwardMenu').hidePopup();}, 500);
 		}, false);
 
@@ -114,24 +112,42 @@
 			}
 		}, false);
 
-		$("uAutoPagerize-icon", {
-			onmouseover: "document.getElementById('uAutoPagerize-popup').openPopup(document.getElementById('uAutoPagerize-icon'));",
+		$('backForwardMenu').addEventListener('mouseout', function() {
+			BFMhideDelay = setTimeout(function() {$('backForwardMenu').hidePopup();}, 500);
+		}, false);
+/******************************************************************** Menuitems ********************************************************************/
+		$('fullScreenItem', {
+			tooltiptext: "左鍵：全螢幕\n右鍵：全螢幕 & 隱藏工具列",
+			onclick: "if (event.button == 2) {BrowserFullScreen(); FullScreen.setAutohide();}"
 		});
 
-		$('uAutoPagerize-icon').addEventListener('mouseout', function() {
-			uAPPhideDelay = setTimeout(function() {$('uAutoPagerize-popup').hidePopup();}, 500);
-		}, false);
+		$("abp-menuitem", {
+			class: "menu-iconic",
+			tooltiptext: "左鍵：Adblock Plus 選單\n中鍵：啟用 / 停用 Adblock Plus\n右鍵：Adblock Plus 條件偏好設定",
+			onclick: "if (event.button == 1) {document.getElementById('abp-menuitem-disabled').click();} else if (event.button == 2) {gBrowser.selectedTab = gBrowser.addTab('chrome://adblockplus/content/ui/filters.xul'); event.preventDefault();}"
+		});
 
-		$('uAutoPagerize-popup').addEventListener('mouseout', function() {
-			uAPPhideDelay = setTimeout(function() {$('uAutoPagerize-popup').hidePopup();}, 500);
-		}, false);
+		$("abp-menuitem-popup", {onclick: "event.preventDefault(); event.stopPropagation();"});
 
-		$('uAutoPagerize-popup').addEventListener('mouseover', function() {
-			if (uAPPhideDelay) {
-				clearTimeout(uAPPhideDelay);
-				uAPPhideDelay = null;
-			}
-		}, false);
+/*		$("abp-toolbarbutton", {
+			tooltiptext: "左鍵：Adblock Plus 選單\n中鍵：啟用 / 停用 Adblock Plus\n右鍵：Adblock Plus 條件偏好設定",
+			onclick: "if (event.button == 2) {gBrowser.selectedTab = gBrowser.addTab('chrome://adblockplus/content/ui/filters.xul'); event.preventDefault();}"
+		});
+
+		$("abp-toolbar-popup", {onclick: "if (event.button == 2) {event.stopPropagation();}"});
+*/
+		$("noscript-tbb", {
+//			tooltiptext: "左鍵：NoScript 選單\n中鍵：暫時允許此頁面的所有物件\n右鍵：取消暫時許可",
+			onclick: "if (event.button == 2) {noscriptOverlay.revokeTemp(); event.preventDefault();}"
+		});
+		
+/*		$("noscript-context-menu", {
+			tooltiptext: "左鍵：NoScript 選單\n中鍵：暫時允許此頁面的所有物件\n右鍵：取消暫時許可",
+			onclick: "if (event.button == 1) {noscriptOverlay.allowPage();} else if (event.button == 2) {noscriptOverlay.revokeTemp();}"
+		});
+		
+		$("noscript-context-popup", {onclick: "noscriptOverlay.onCommandClick(event); event.preventDefault(); event.stopPropagation();"});
+*/
 	}
 
 	function $(id, attr) {
@@ -140,5 +156,5 @@
 		return el;
 	}
 
-	if (location == "chrome://browser/content/browser.xul") {setTimeout(DelayStart, 1000);}
+	if (location == "chrome://browser/content/browser.xul") {setTimeout(DelayStart, 5000);}
 })();
