@@ -32,10 +32,10 @@ function CloseRepeatedTabs(checkAnchors) {
 	}
 	if (msg != "")
 //		alert("\u95DC\u9589\u7684\u91CD\u8907\u5206\u9801:\n\n" + msg);
-		XULBrowserWindow.statusTextField.label = "關閉的重複分頁:" + msg + " ";
+		XULBrowserWindow.statusTextField.label = "關閉的重複分頁:" + msg;
 	else
 //		alert("\u6C92\u6709\u91CD\u8907\u5206\u9801");
-		XULBrowserWindow.statusTextField.label = "沒有重複分頁 ";
+		XULBrowserWindow.statusTextField.label = "沒有重複分頁";
 };
 
 function HideFirefox() {
@@ -239,7 +239,7 @@ var MGs = {
 		loadURI(RegExp.leftContext + num + RegExp.$2);
 	},
 	FindScroll: function(TXT, TOF) {
-//		gFindBar.open();
+		gFindBar.open();
 		gFindBar.toggleHighlight(1);
 		gFindBar.getElement('highlight').setAttribute('checked', 'true');
 //		gFindBar.getElement('highlight').setAttribute('checkState', '1');
@@ -250,14 +250,14 @@ var MGs = {
 		gWHT.find(TXT, TOF);
 	},
 	FindReset: function() {
-//		gFindBar.close();
+		gFindBar.close();
 		gFindBar.toggleHighlight(0);
 		gFindBar.getElement('highlight').setAttribute('checked', 'false');
 //		gFindBar.getElement('highlight').setAttribute('checkState', '0');
 		document.getElementById('searchbar').value = '';
 		gFindBar._findField.value = '';
-		gFindBar._foundMatches.hidden = true;
-		gFindBar._foundMatches.value = '';
+//		gFindBar._foundMatches.hidden = true;
+//		gFindBar._foundMatches.value = '';
 		gWHT.destroyToolbar();
 	},
 	dTaBtn: function(ID) {
@@ -351,4 +351,29 @@ var MGs = {
 			theBrowser.selectedTab = newTab;
 		}
 	},
+};
+var SwitchSearch = {
+	onClick: function(event) {
+		var x = document.getElementById('searchbar').value || getBrowserSelection() || readFromClipboard(),
+			label = event.target.getAttribute('label'),
+			url = event.target.getAttribute('url');
+		document.getElementById('searchbar').value = "";
+		if (label == "Google 加密站內") {
+			var y = url + content.location.host + " " + x;
+		}
+		else {
+			var y = url + x;
+		}
+		switch(event.button) {
+			case 0:
+				gBrowser.selectedTab = gBrowser.addTab(y);
+			break;
+			case 1:
+				loadURI(y);
+			break;
+			case 2:
+				gBrowser.addTab(y);
+			break;
+		}
+	}
 };
