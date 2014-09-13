@@ -7,10 +7,14 @@
 // @license        MIT License
 // @compatibility  Firefox 21
 // @charset        UTF-8
-// @version        2014.8.26
-// @version        0.0.9
+// @version        2014.9.12
+// @version        0.1.0
+// @startup        window.addMenu.init();
+// @shutdown       window.addMenu.destroy();
+// @config         window.addMenu.edit(addMenu.FILE);
 // @homepageURL    https://github.com/ywzhaiqi/userChromeJS/tree/master/addmenuPlus
 // @reviewURL      https://github.com/Griever/userChromeJS/tree/master/addMenu
+// @note           0.1.0 menugroup をとりあえず利用できるようにした
 // @note           0.0.9 Firefox 29 の Firefox Button 廃止に伴いファイルメニューに追加するように変更
 // @note           0.0.8 Firefox 25 の getShortcutOrURI 廃止に仮対応
 // @note           0.0.7 Firefox 21 の Favicon 周りの変更に対応
@@ -220,7 +224,7 @@ window.addMenu = {
 		ins = $("appmenu-quit") || $("menu_FileQuitItem");
 		ins.parentNode.insertBefore(
 			$C("menuseparator", { id: "addMenu-app-insertpoint", class: "addMenu-insert-point" }), ins);
-		//ins = $('jscmdseparator') || $("devToolsSeparator");
+		//ins = $("devToolsSeparator");
 		//ins.parentNode.insertBefore($C("menuitem", {
 			//id: "addMenu-rebuild",
 			//label: "addMenuPlus",
@@ -253,6 +257,10 @@ window.addMenu = {
 			case "popupshowing":
 				if (event.target != event.currentTarget) return;
 
+				if (enableFileRefreshing) {
+					this.updateModifiedFile();
+				}
+
 				if (event.target.id == 'contentAreaContextMenu') {
 					var state = [];
 					if (gContextMenu.onTextInput)
@@ -268,10 +276,15 @@ window.addMenu = {
 					if (gContextMenu.onVideo || gContextMenu.onAudio)
 						state.push("media");
 					event.currentTarget.setAttribute("addMenu", state.join(" "));
-				}
 
-				if (enableFileRefreshing) {
-					this.updateModifiedFile();
+					this.customShowings.forEach(function(obj){
+						var curItem = obj.item;
+						try {
+							eval('(' + obj.fnSource + ').call(curItem, curItem)');
+						} catch(ex) {
+							console.error('addMenuPlus 自定義顯示錯誤', obj.fnSource);
+						}
+					});
 				}
 				break;
 		}
@@ -378,7 +391,8 @@ window.addMenu = {
 			{ current: "page", submenu: "PageMenu", insertId: "addMenu-page-insertpoint" },
 			{ current: "tab" , submenu: "TabMenu" , insertId: "addMenu-tab-insertpoint"  },
 			{ current: "tool", submenu: "ToolMenu", insertId: "addMenu-tool-insertpoint" },
-			{ current: "app" , submenu: "AppMenu" , insertId: "addMenu-app-insertpoint"  }
+			{ current: "app" , submenu: "AppMenu" , insertId: "addMenu-app-insertpoint"  },
+			{ current: "group", submenu: "GroupMenu" , insertId: "addMenu-page-insertpoint"  },
 		];
 
 		var data = loadText(aFile);
@@ -401,11 +415,17 @@ window.addMenu = {
 
 		aiueo.forEach(function({ current, submenu }){
 			sandbox["_" + current] = [];
-			sandbox[current] = function(itemObj) {
-				ps(itemObj, sandbox["_" + current]);
+			if (submenu != 'GroupMenu') {
+				sandbox[current] = function(itemObj) {
+					ps(itemObj, sandbox["_" + current]);
+				}
 			}
 			sandbox[submenu] = function(menuObj) {
-				menuObj._items = []
+				if (!menuObj)
+					menuObj = {};
+				menuObj._items = [];
+				if (submenu == 'GroupMenu')
+					menuObj._group = true;
 				sandbox["_" + current].push(menuObj);
 				return function(itemObj) {
 					ps(itemObj, menuObj._items);
@@ -437,6 +457,8 @@ window.addMenu = {
 
 		this.removeMenuitem();
 
+		this.customShowings = [];
+
 		aiueo.forEach(function({ current, submenu, insertId }){
 			if (!sandbox["_" + current] || sandbox["_" + current].length == 0) return;
 			let insertPoint = $(insertId);
@@ -445,11 +467,34 @@ window.addMenu = {
 
 		if (isAlert) this.alert(U("配置已經重新載入"));
 	},
+	newGroupMenu: function (menuObj) {
+		var group = document.createElement('menugroup');
+		Object.keys(menuObj).map(function(key) {
+			var val = menuObj[key];
+			if (key === "_items") return;
+			if (key === "_group") return;
+			if (typeof val == "function")
+				menuObj[key] = val = "(" + val.toSource() + ").call(this, event);";
+			group.setAttribute(key, val);
+		}, this);
+		let cls = group.classList;
+		cls.add('addMenu');
+
+		// 表示 / 非表示の設定
+		if (menuObj.condition)
+			this.setCondition(group, menuObj.condition);
+
+		menuObj._items.forEach(function(obj) {
+			group.appendChild(this.newMenuitem(obj, { isMenuGroup: true }));
+		}, this);
+		return group;
+	},
 	newMenu: function(menuObj) {
-		var isMenuGroup = (menuObj._type == 'group');
-		var type = isMenuGroup ? 'menugroup' : 'menu';
-		var menu = document.createElement(type);
-		var popup = isMenuGroup ? menu : menu.appendChild(document.createElement("menupopup"));
+		if (menuObj._group) {
+			return this.newGroupMenu(menuObj);
+		}
+		var menu = document.createElement("menu");
+		var popup = menu.appendChild(document.createElement("menupopup"));
 		for (let [key, val] in Iterator(menuObj)) {
 			if (key === "_items") continue;
 			if (typeof val == "function")
@@ -465,7 +510,7 @@ window.addMenu = {
 			this.setCondition(menu, menuObj.condition);
 
 		menuObj._items.forEach(function(obj) {
-			popup.appendChild(this.newMenuitem(obj, isMenuGroup));
+			popup.appendChild(this.newMenuitem(obj));
 		}, this);
 
 		// menu に label が無い場合、最初の menuitem の label 等を持ってくる
@@ -495,14 +540,13 @@ window.addMenu = {
 		}
 		return menu;
 	},
-	newMenuitem: function(obj, isMenuGroup) {
+	newMenuitem: function(obj, opt) {
+		opt || (opt = {});
+
 		var menuitem;
 		// label == separator か必要なプロパティが足りない場合は區切りとみなす
-		var isSpacer = obj._type === 'spacer';
-		if (isSpacer) {
-			menuitem = document.createElement("spacer");
-		} else if (obj.label === "separator" ||
-			(!obj.label && !obj.text && !obj.keyword && !obj.url && !obj.oncommand && !obj.command)) {
+		if (obj.label === "separator" ||
+			(!obj.label && !obj.image && !obj.text && !obj.keyword && !obj.url && !obj.oncommand && !obj.command)) {
 			menuitem = document.createElement("menuseparator");
 		} else if (obj.oncommand || obj.command) {
 			let org = obj.command ? document.getElementById(obj.command) : null;
@@ -532,7 +576,7 @@ window.addMenu = {
 			if (obj.where && /\b(tab|tabshifted|window|current)\b/i.test(obj.where))
 				obj.where = RegExp.$1.toLowerCase();
 
-			if (obj.where && !("acceltext" in obj) && !isMenuGroup)
+			if (obj.where && !("acceltext" in obj))
 				obj.acceltext = obj.where;
 
 			if (!obj.condition && (obj.url || obj.text)) {
@@ -552,36 +596,40 @@ window.addMenu = {
 			}
 		}
 
+		// 右鍵第一層菜單添加 onpopupshowing 事件
+		if (opt.isTopMenuitem && obj.onshowing) {
+			this.customShowings.push({
+				item: menuitem,
+				fnSource: obj.onshowing.toSource()
+			});
+			delete obj.onshowing;
+		}
+
 		// obj を屬性にする
 		for (let [key, val] in Iterator(obj)) {
 			if (key === "command") continue;
-			if (key === "_type") continue;
 			if (typeof val == "function")
 				obj[key] = val = "(" + val.toSource() + ").call(this, event);";
 			menuitem.setAttribute(key, val);
 		}
-
 		var cls = menuitem.classList;
 		cls.add("addMenu");
-		if (!isSpacer)
-			cls.add("menuitem-iconic");
+		cls.add("menuitem-iconic");
 
 		// 表示 / 非表示の設定
 		if (obj.condition)
 			this.setCondition(menuitem, obj.condition);
 
 		// separator はここで終了
-		if (menuitem.localName == "menuseparator" || isSpacer)
+		if (menuitem.localName == "menuseparator")
 			return menuitem;
 
 		if (!obj.onclick)
 			menuitem.setAttribute("onclick", "checkForMiddleClick(this, event)");
 
-		if (isMenuGroup && menuitem.getAttribute("label")) {
-			menuitem.setAttribute('aria-label', menuitem.getAttribute("label"));
-			if (!menuitem.hasAttribute('tooltiptext'))
-				menuitem.setAttribute('tooltiptext', menuitem.getAttribute("label"));
-			menuitem.removeAttribute('label');
+		// 給 MenuGroup 的菜單加上 tooltiptext
+		if (opt.isMenuGroup && !obj.tooltiptext && obj.label) {
+			menuitem.setAttribute('tooltiptext', obj.label);
 		}
 
 		// oncommand, command はここで終了
@@ -642,7 +690,7 @@ window.addMenu = {
 				continue;
 			}
 
-			menuitem = obj._items ? this.newMenu(obj) : this.newMenuitem(obj);
+			menuitem = obj._items ? this.newMenu(obj) : this.newMenuitem(obj, { isTopMenuitem: true });
 			insertMenuItem(obj, menuitem);
 
 		}
@@ -674,7 +722,7 @@ window.addMenu = {
 			e.parentNode.removeChild(e);
 		};
 
-		$$('menu.addMenu').forEach(remove);
+		$$('menu.addMenu, menugroup.addMenu').forEach(remove);
 		$$('.addMenu').forEach(remove);
 		// 恢復原隱藏菜單
 		$$('.addMenuHide').forEach(function(e) { e.classList.remove('addMenuHide');} );
@@ -920,6 +968,43 @@ window.addMenu = {
 		Cc["@mozilla.org/widget/clipboardhelper;1"].getService(Ci.nsIClipboardHelper).copyString(aText);
 		XULBrowserWindow.statusTextField.label = "複製：" + aText;
 	},
+	copyLink: function(copyURL, copyLabel) {
+		// generate the Unicode and HTML versions of the Link
+		var textUnicode = copyURL;
+		var textHtml = ("<a href=\"" + copyURL + "\">" + copyLabel + "</a>");
+
+		// make a copy of the Unicode
+		var str = Components.classes["@mozilla.org/supports-string;1"].
+		createInstance(Components.interfaces.nsISupportsString);
+		if (!str) return false; // couldn't get string obj
+		str.data = textUnicode; // unicode string?
+
+
+		// make a copy of the HTML
+		var htmlstring = Components.classes["@mozilla.org/supports-string;1"].
+		createInstance(Components.interfaces.nsISupportsString);
+		if (!htmlstring) return false; // couldn't get string obj
+		htmlstring.data = textHtml;
+
+		// add Unicode & HTML flavors to the transferable widget
+		var trans = Components.classes["@mozilla.org/widget/transferable;1"].
+		createInstance(Components.interfaces.nsITransferable);
+		if (!trans) return false; //no transferable widget found
+
+		trans.addDataFlavor("text/unicode");
+		trans.setTransferData("text/unicode", str, textUnicode.length * 2); // *2 because it's unicode
+
+		trans.addDataFlavor("text/html");
+		trans.setTransferData("text/html", htmlstring, textHtml.length * 2); // *2 because it's unicode 
+
+		// copy the transferable widget!
+		var clipboard = Components.classes["@mozilla.org/widget/clipboard;1"].
+		getService(Components.interfaces.nsIClipboard);
+		if (!clipboard) return false; // couldn't get the clipboard
+
+		clipboard.setData(trans, null, Components.interfaces.nsIClipboard.kGlobalClipboard);
+		return true;
+	},
 	alert: function (aMsg, aTitle, aCallback) {
 		var callback = aCallback ? {
 			observe : function (subject, topic, data) {
@@ -1146,6 +1231,21 @@ menuitem.addMenu[text]:not([url]):not([keyword]):not([exec])\
 .addMenu > .menu-iconic-left {\
   -moz-appearance: menuimage;\
 }\
-menugroup.addMenu > .menuitem-iconic { max-width: 10px; }\
-menugroup.addMenu .menu-iconic-icon { margin-left:2px; }\
+\
+menugroup.addMenu {\
+  background-color: menu;\
+  padding-bottom: 4px;\
+}\
+menugroup.addMenu > .menuitem-iconic {\
+  -moz-box-flex: 1;\
+  -moz-box-pack: center;\
+  -moz-box-align: center;\
+}\
+menugroup.addMenu > .menuitem-iconic > .menu-iconic-left {\
+  -moz-appearance: none;\
+}\
+menugroup.addMenu > .menuitem-iconic > .menu-iconic-text,\
+menugroup.addMenu > .menuitem-iconic > .menu-accel-container {\
+  display: none;\
+}\
 ');
