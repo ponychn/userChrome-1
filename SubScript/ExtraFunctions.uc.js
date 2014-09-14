@@ -377,3 +377,24 @@ var SwitchSearch = {
 		}
 	}
 };
+var OpenUrl = {
+	onClick: function(event) {
+		var href = event.target.getAttribute('href'),
+			url = content.location;
+		if (!href) return;
+		if (url == "about:blank") {loadURI(href);}
+		else {
+			switch(event.button) {
+				case 0:
+					gBrowser.moveTabTo(gBrowser.addTab(href), gBrowser.mCurrentTab._tPos + 1);
+				break;
+				case 1:
+					loadURI(href);
+				break;
+				case 2:
+					gBrowser.selectedTab = gBrowser.addTab(href);
+				break;
+			}
+		}
+	}
+};
