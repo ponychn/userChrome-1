@@ -1,16 +1,9 @@
 // ==UserScript==
-// @name           OriginalBtnPlus.uc.js
-// @homepageURL    https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/OriginalBtnPlus.uc.js
+// @name           FunctionsPlus.uc.js
+// @homepageURL    https://github.com/Drager-oos/userChrome/blob/master/SubScript/FunctionsPlus.uc.js
 // ==/UserScript==
 
 (function() {
-	$("TabsToolbar").appendChild($("alltabs-button", {
-		tooltiptext: "左鍵：所有分頁選單",
-		style: "padding: 0px;"
-	}));
-	var ATsPopup = $("alltabs-popup", {onclick: 'event.preventDefault(); event.stopPropagation();'});
-		ATsPopup.addEventListener("mouseover", function (event) {event.originalTarget.setAttribute('closemenu', 'none')}, true);
-
 	$("urlbar").appendChild($("PanelUI-button", {
 		tooltiptext: "左鍵：開啟選單\n中鍵：新建窗口並重載腳本\n右鍵：窗口占用屏幕右下半部分\n向上滾動：隱藏Firefox\n向下滾動：清除startupCache並重新啟動瀏覽器",
 		onclick: "\
@@ -50,13 +43,16 @@
 		addMenu.rebuild(true);
 	}, 2000);
 
-	function DelayStart() {
-/********************************************************************* Buttons *********************************************************************/
+	function DelayButtonsStart() {
+//		$("urlbar-icons").appendChild($("clipple-statusbar-icon"));
+
+		$("alltabs-button", {tooltiptext: "左鍵：所有分頁選單",});
+		$("alltabs-popup", {onclick: 'event.preventDefault(); event.stopPropagation();'});
+		$("alltabs-popup").addEventListener("mouseover", function (event) {event.originalTarget.setAttribute('closemenu', 'none')}, true);
+
 		$("editBookmarkPanel", {position: "after_start"});
 
 		$("UserMenu-button", {onmouseover: "document.getElementById('downloadsPanel').hidePopup();",});
-
-//		$("urlbar-icons").appendChild($("clipple-statusbar-icon"));
 
 		$("urlbar-reload-button", {
 			tooltiptext: "左鍵：重新載入此分頁\n滾動：重新載入所有分頁\n\n在復原分頁選單：\n右鍵：清除復原分頁列表",
@@ -68,8 +64,8 @@
 			onDOMMouseScroll: "Array.map(gBrowser.browsers, function(browser) {browser.stop()});",
 		});
 
-		var uCTPhideDelay, BFMhideDelay;
-
+		/* 在特定按鈕上自動彈出選單 */
+		var uCTPhideDelay;
 		$("urlbar-reload-button").addEventListener('mouseover', function(event) {
 			$('undoCloseTabPopup').openPopupAtScreen(event.screenX, event.screenY, true);
 			if (uCTPhideDelay) {
@@ -77,7 +73,6 @@
 				uCTPhideDelay = null;
 			}
 		}, false);
-
 		$('urlbar-reload-button').addEventListener('mouseout', function() {
 			uCTPhideDelay = setTimeout(function() {$('undoCloseTabPopup').hidePopup();}, 500);
 		}, false);
@@ -88,11 +83,11 @@
 				uCTPhideDelay = null;
 			}
 		}, false);
-
 		$('undoCloseTabPopup').addEventListener('mouseout', function() {
 			uCTPhideDelay = setTimeout(function() {$('undoCloseTabPopup').hidePopup();}, 500);
 		}, false);
 
+		var BFMhideDelay;
 		$("back-button").addEventListener('mouseover', function(event) {
 			$('backForwardMenu').openPopupAtScreen(event.screenX, event.screenY, true);
 			if (BFMhideDelay) {
@@ -100,7 +95,6 @@
 				BFMhideDelay = null;
 			}
 		}, false);
-
 		$('back-button').addEventListener('mouseout', function() {
 			BFMhideDelay = setTimeout(function() {$('backForwardMenu').hidePopup();}, 500);
 		}, false);
@@ -111,11 +105,100 @@
 				BFMhideDelay = null;
 			}
 		}, false);
-
 		$('backForwardMenu').addEventListener('mouseout', function() {
 			BFMhideDelay = setTimeout(function() {$('backForwardMenu').hidePopup();}, 500);
 		}, false);
-/******************************************************************** Menuitems ********************************************************************/
+	}
+
+	function DelayMenuitemsStart() {
+	/* 複製選單項到工具選單 */
+		var n, Item, FavIDs;
+		FavIDs = [
+			'goOfflineMenuitem',
+			'fullScreenItem',
+			'FavIconReloader',
+			'subscribeToPageMenuitem',
+			'subscribeToPageMenupopup',
+//			'bookmarksToolbarFolderMenu',
+			];
+		for(n = 0; n < FavIDs.length; n++) {
+			Item = $(FavIDs[n]);
+				if (Item) {
+					Item = Item.cloneNode(true);
+					Item.removeAttribute('key');
+				}
+			if (Item!=null) $('devToolsSeparator').parentNode.insertBefore(Item, $('devToolsSeparator'));
+//			if (Item!=null) $('alltabs-popup').insertBefore(Item, $('alltabs-popup-separator')); /* 所有分頁選單 */
+//			if (Item!=null) $('contentAreaContextMenu').appendChild(Item); /* 右鍵選單 */
+//			if (Item!=null) $('BMB_bookmarksPopup').insertBefore(Item, $('BMB_bookmarksPopup').firstChild); /* 書籤按鈕選單 */
+//			if (Item!=null) $('BMB_bookmarksPopup').insertBefore(Item, $('BMB_viewBookmarksSidebar')); /* $('BMB_bookmarksToolbar') */
+		}
+
+		var n, Item, FavIDs;
+		FavIDs = [
+			'file-menu',
+			'edit-menu',
+			'view-menu',
+			'history-menu',
+			'bookmarksMenu',
+//			'tools-menu',
+			'helpMenu',
+			];
+		for(n = 0; n < FavIDs.length; n++) {
+			var FavID = FavIDs[n];
+				Item = $(FavID);
+				if (Item) {
+//					Item = Item.cloneNode(true);
+					Item.removeAttribute('key');
+				}
+			if (Item!=null) $('menu_ToolsPopup').insertBefore(Item, $('webDeveloperMenu'));
+		}
+
+		var n, Item, FavIDs;
+		FavIDs = [
+			'charsetMenu',
+			];
+		for(n = 0; n < FavIDs.length; n++) {
+			var FavID = FavIDs[n];
+				Item = $(FavID);
+				if (Item) {
+					Item = Item.cloneNode(true);
+					Item.removeAttribute('key');
+				}
+			if (Item!=null) $('menu_ToolsPopup').insertBefore(Item, $('webDeveloperMenu'));
+		}
+
+		var n, Item, FavIDs;
+		FavIDs = [
+			'noscript-context-menu',
+			'tongwen-context-menu',
+			];
+		for(n = 0; n < FavIDs.length; n++) {
+			var FavID = FavIDs[n];
+				Item = $(FavID);
+				if (Item) {
+					Item = Item.cloneNode(true);
+					Item.removeAttribute('key');
+				}
+			if (Item!=null) $('menu_ToolsPopup').insertBefore(Item, $("menu_preferences"));
+		}
+
+		var ClippleMenu = $('menu_ToolsPopup').insertBefore($C("menu", {
+			id: "Clipple-AnoMenu",
+			class: "menu-iconic",
+			label: "Clipple!",
+			image: "chrome://clipple/skin/icon16/paste.png",
+		}), $("menu_preferences"));
+			ClippleMenu.appendChild($("clipple-menu"));
+
+		var tczoompanelMenu = $('menu_ToolsPopup').insertBefore($C("menu", {
+			id: "tczoompanel-AnoMenu",
+			class: "menu-iconic",
+			label: "快速縮放",
+			image: "chrome://zoompanel/skin/zoompanel.png",
+		}), $("menu_preferences"));
+			tczoompanelMenu.appendChild($("tczoompanel_Popup"));
+
 		$('fullScreenItem', {
 			tooltiptext: "左鍵：全螢幕\n右鍵：全螢幕 & 隱藏工具列",
 			onclick: "if (event.button == 2) {BrowserFullScreen(); FullScreen.setAutohide();}"
@@ -150,11 +233,36 @@
 */
 	}
 
+	var popup = $("mainPopupSet").appendChild($C("menupopup", {
+		id: "undoCloseTabPopup",
+		onpopupshowing: "this.populateUndoSubmenu();",
+		tooltip: "bhTooltip",
+		popupsinherittooltip: "true",
+		onclick: "if (event.button == 2) {\
+			XULBrowserWindow.statusTextField.label = '清除復原分頁列表';\
+			var Setting = 'browser.sessionstore.max_tabs_undo';\
+			gPrefService.setIntPref(Setting, 0);\
+			gPrefService.setIntPref(Setting, 50);\
+			event.target.parentNode.hidePopup();\
+			event.preventDefault();\
+		}\
+		",
+	}));
+	popup.populateUndoSubmenu = eval("(" + HistoryMenu.prototype.populateUndoSubmenu.toString().replace("undoMenu.firstChild", "this").replace(/.*undoMenu.*/g, "") + ")");
+
 	function $(id, attr) {
 		var el = document.getElementById(id);
 		if (attr) Object.keys(attr).forEach(function(n) el.setAttribute(n, attr[n]));
 		return el;
 	}
+	function $C(name, attr) {
+		var el = document.createElement(name);
+		if (attr) Object.keys(attr).forEach(function(n) el.setAttribute(n, attr[n]));
+		return el;
+	}
 
-	if (location == "chrome://browser/content/browser.xul") {setTimeout(DelayStart, 5000);}
+	if (location == "chrome://browser/content/browser.xul") {
+		setTimeout(DelayButtonsStart, 5000);
+		setTimeout(DelayMenuitemsStart, 5000);
+	}
 })();
