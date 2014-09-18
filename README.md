@@ -30,8 +30,7 @@ UC 腳本整合帖
 <li><a href="https://github.com/defpt/userChromeJs">defpt</a><br></li>
 <li><a href="http://pan.baidu.com/share/home?uk=2467242534#category/type=0">黒儀大螃蟹</a><br></li>
 <li><a href="https://bitbucket.org/zbinlin">zbinlin</a><br></li>
-<li>紫云飛</li>
-<a href="http://www.cnblogs.com/ziyunfei/archive/2011/11/25/2263756.html">UserChromeJS腳本</a><br>
+<li><a href="http://www.cnblogs.com/ziyunfei/archive/2011/11/25/2263756.html">紫云飛</a><br></li>
 <a href="http://www.cnblogs.com/ziyunfei/archive/2012/02/05/2338725.html">uc腳本轉擴展</a><br>
 <a href="http://www.cnblogs.com/ziyunfei/archive/2011/12/15/2289504.html">鼠標手勢UserChromeJS腳本在線生成器</a><br>
 <a href="http://www.cnblogs.com/ziyunfei/archive/2011/12/20/2293928.html">鼠標拖拽UserChromeJS腳本在線生成器</a><br>
@@ -53,7 +52,9 @@ MainScript
 </ol>
 <ol>
 SubScript
-<li><a href="https://github.com/Drager-oos/userChrome/blob/master/SubScript/ExtraFuctions.uc.js">ExtraFuctions.uc.js</a><br></li>
+<li><a href="https://github.com/Drager-oos/userChrome/blob/master/SubScript/ExtraFunctions.uc.js">ExtraFunctions.uc.js</a><br></li>
+<li><a href="https://github.com/Drager-oos/userChrome/blob/master/SubScript/FunctionsPlus.uc.js">FunctionsPlus.uc.js</a><br></li>
+<li><a href="https://github.com/Drager-oos/userChrome/blob/master/SubScript/Backups/googleSearchIcons.uc.js">googleSearchIcons.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/SubScript/LinkLocationbarLite.uc.js">LinkLocationbarLite.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/SubScript/LoadingBar.uc.js">LoadingBar.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/SubScript/RightClickLinkinNewTab.uc.js">RightClickLinkinNewTab.uc.js</a><br></li>
@@ -62,9 +63,7 @@ SubScript
 </ol>
 <ol>
 userBtn
-<li><a href="https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/AnotherBrowserBtn.uc.js">AnotherBrowserBtn.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/FullScreenBrowserManipulateBtn.uc.js">FullScreenBrowserManipulateBtn.uc.js</a><br></li>
-<li><a href="https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/OriginalBtnPlus.uc.js">OriginalBtnPlus.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/SearchbarBtnPlus.uc.js">SearchbarBtnPlus.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/StarBtnPlus.uc.js">StarBtnPlus.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/TabPlus.uc.js">TabPlus.uc.js</a><br></li>
@@ -73,9 +72,8 @@ userBtn
 </ol>
 <ol>
 userMenu
+<li><a href="https://github.com/Drager-oos/userChrome/blob/master/userMenu/AutoSelectPopup.uc.js">AutoSelectPopup.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/userMenu/copybookmark.uc.js">copybookmark.uc.js</a><br></li>
-<li><a href="https://github.com/Drager-oos/userChrome/blob/master/userMenu/CopyMenuitemsToMenu.uc.js">CopyMenuitemsToMenu.uc.js</a><br></li>
-<li><a href="https://github.com/Drager-oos/userChrome/blob/master/userMenu/ExtensionsMenuitems.uc.js">ExtensionsMenuitems.uc.js</a><br></li>
 <li><a href="https://github.com/Drager-oos/userChrome/blob/master/userMenu/updatebookmarklite.uc.js">updatebookmarklite.uc.js</a><br></li>
 </ol>
 <ol>
@@ -100,12 +98,15 @@ xul
 <li><a href="http://bbs.kafan.cn/thread-1741525-1-1.html">SearchbarBtnPlus.uc.js</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1749331-1-1.html">autoSearchPopup.uc.js</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1759415-1-1.html">AutoSelectPopup.uc.js</a><br></li>
+<li><a href="http://bbs.kafan.cn/thread-1770079-1-1.html">AutoSelectPopup.uc.js 配置外置版</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1761923-1-1.html">DoubleClickZone.uc.js</a><br></li>
+<li><a href="http://bbs.kafan.cn/thread-1770128-1-1.html">addBtn.uc.js 配置外置版</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1739635-1-1.html">[修改發佈] AnotherBrowserBtn.uc.js</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1748650-1-1.html">TriggerZone.uc.js</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1747400-1-1.html">ShowDateAndTime.uc.js - 顯示現時日期和時間</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1755453-1-1.html">RightClickLinkinNewTab.uc.js 和 link 相關腳本</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1739999-1-1.html">數個 UC 腳本 (LinkLocationbarLite, StarBtnPlus, AllTabsBtnPlus, ...)</a><br></li>
+<li><a href="http://bbs.kafan.cn/thread-1772029-1-1.html">在不是菜單按鈕上自動彈出特定菜單</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1739649-1-1.html">_addmenu.js - 快速回覆修改版 & 標點符號選單</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1750226-1-1.html">_addmenu.js - 搜索選單</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1752591-1-1.html">_addmenu.js - PreSuffixMenu</a><br></li>
@@ -115,7 +116,7 @@ xul
 <li><a href="http://bbs.kafan.cn/thread-1768925-1-1.html">善用 addMenuPlus.uc.js - 打造適合自己的菜單</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1743344-1-1.html">簡單的不可移動按鈕教程</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1743975-1-1.html">代碼 - 修改about:config中的特定值</a><br></li>
-<li><a href="http://bbs.kafan.cn/thread-1754619-1-1.html">不需要重新啟動的擴展集合帖2014.7.14</a><br></li>
+<li><a href="http://bbs.kafan.cn/thread-1754619-1-1.html">不需要重新啟動的擴展集合帖</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1756715-1-1.html">WordHighlightToolbar & 查找欄樣式分享</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1758572-1-1.html">標籤樣式分享</a><br></li>
 <li><a href="http://bbs.kafan.cn/thread-1758660-1-1.html">側邊欄樣式分享</a><br></li>
@@ -148,6 +149,7 @@ Commonly Used (Default: enabled)
 Non-Commonly Used (Using when needed, Default: disabled)
 <li><a href="https://addons.mozilla.org/zh-TW/firefox/addon/about-addons-memory/">about:addons-memory</a><br></li>
 <li><a href="https://addons.mozilla.org/zh-TW/firefox/addon/add-to-search-bar/">Add to Search Bar</a><br></li>
+<li><a href="https://addons.mozilla.org/zh-TW/firefox/addon/bookmark-deduplicator/">Bookmark Deduplicator</a><br></li>
 <li><a href="https://addons.mozilla.org/zh-TW/firefox/addon/clean-links/">Clean Links</a><br></li>
 <li><a href="https://addons.mozilla.org/zh-TW/firefox/addon/dolus/">Dolus</a><br></li>
 <li><a href="https://addons.mozilla.org/zh-TW/firefox/addon/dom-inspector-6622/">DOM Inspector</a><br></li>
@@ -182,6 +184,7 @@ Non-Commonly Used (Using when needed, Default: disabled)
 <li><a href="https://addons.mozilla.org/zh-TW/firefox/addon/roomy-bookmarks-toolbar/">Roomy Bookmarks Toolbar</a><br></li>
 <li><a href="https://addons.mozilla.org/zh-TW/firefox/addon/stylish/">Stylish</a><br></li>
 <li><a href="https://addons.mozilla.org/zh-TW/firefox/addon/super-drag/">Super Drag</a><br></li>
+<li><a href="https://addons.mozilla.org/zh-TW/firefox/addon/tabcinema/">TabCinema</a><br></li>
 <li><a href="https://addons.mozilla.org/zh-TW/firefox/addon/tab-mix-plus/">Tab Mix Plus</a><br></li>
 <li><a href="https://addons.mozilla.org/zh-TW/firefox/addon/tab-utilities/">Tab Utilities</a><br></li>
 <li><a href="https://addons.mozilla.org/zh-TW/firefox/addon/toolbar-buttons/">Toolbar Buttons</a><br></li>
