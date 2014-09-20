@@ -1,5 +1,6 @@
 // ==UserScript==
 // @name           AutoSelectPopup.uc.js
+// @description    當雙擊頁面 / 選取文字後，便自動彈出自定選單，按住 C / Ctrl + C 便複製
 // @note           配置外置版
 // @homepageURL    https://github.com/Drager-oos/userChrome/blob/master/userMenu/AutoSelectPopup.uc.js
 // ==/UserScript==
@@ -12,7 +13,7 @@ location == "chrome://browser/content/browser.xul" && (function() {
 			delete this.FILE;
 			return this.FILE = aFile;
 		},
-		configs: [],
+		configs: {},
 		init: function() {
 			var ASPopup = $("mainPopupSet").appendChild($C("menupopup", {
 				id: "AutoSelect-popup",
@@ -36,6 +37,7 @@ location == "chrome://browser/content/browser.xul" && (function() {
 			}), $('devToolsSeparator'));
 
 			setTimeout(function() {ASP.rebuild();}, 1000);
+			ASP.startup();
 		},
 		rebuild: function(isAlert) {
 			var aFile = this.FILE;
@@ -80,22 +82,59 @@ location == "chrome://browser/content/browser.xul" && (function() {
 				ASPMG.removeChild(ASPMG.childNodes[i]);
 			}
 
-			for (var i = 0; i < this.configs.length; i++) {
-				var btn = this.configs[i];
+			for (var i = 0; i < this.configs.buttons.length; i++) {
+				var btn = this.configs.buttons[i];
 				let btnItems = ASPMG.appendChild($C('toolbarbutton', {
 					tooltiptext: btn.label,
 					image: btn.image,
+					state: btn.state
 				}));
-				if (typeof btn.oncommand == 'function') {
-					btnItems.setAttribute('oncommand', btn.oncommand.toSource() + '.call(this, event);');
-				} else {
-					btnItems.setAttribute('oncommand', btn.oncommand);
-				}
 				if (typeof btn.onclick == 'function') {
 					btnItems.setAttribute('onclick', btn.onclick.toSource() + '.call(this, event);');
 				} else {
 					btnItems.setAttribute('onclick', btn.onclick);
 				}
+				if (typeof btn.onDOMMouseScroll == 'function') {
+					btnItems.setAttribute('onDOMMouseScroll', btn.onDOMMouseScroll.toSource() + '.call(this, event);');
+				} else {
+					btnItems.setAttribute('onDOMMouseScroll', btn.onDOMMouseScroll);
+				}
+			}
+
+			var SearchBtn = ASPMG.appendChild($C("toolbarbutton", {
+				id: "SearchMenu-button",
+				type: "menu",
+				tooltiptext: "左鍵：Google 加密\n中鍵：百度貼吧\n右鍵：Google 加密站內\n向上滾動：百度圖片\n向下滾動：Google 圖片\n\n❖ 若搜索欄有文字，便搜尋搜索欄文字\n❖ 若搜索欄沒有文字並選取了文字，便搜尋選取文字\n❖ 否則便搜尋剪貼簿中的文字\n❖ 新分頁前景",
+				image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACo0lEQVQ4jY3Mz2vTcBgG8FdnallK3VKW/mAuLLD1B8OlI23arW22NGWHUNMcwkAHybZT0a21uq60PWQDxzwNetCL9KJ40FvBg55E/wTR01BBEMSDB0Xc6vZ6Sike5r7wuTzf530AAMCyrPP1ev2apmlPFUV5eRpN0540m80CAJwD+9g0zcfhcBhDoRCGw+FThUIhjEQiaJpmCwAAGo2GHgwGcWJiomdqaupYFMWPkiS9TSaTP/r/bJFIBGu1mgT5fP4Ry7Jok2X51dbW1rSu6wOtVuuiZVkuwzBucRz3q7/HsiwqirIPkiR1GIZBhmFwfn7+tWVZg2tra9VMJvNZEISfuVzuRbPZDBaLxcLk5OSx3WUYBmVZboMoip1AIIDj4+Mn1WqVX11dvT06OoqBQKAnHo9/2tvbuyRJ0vP+fGFhoQ2pVKrj9XpxZmbmi67rA/F4/MDr9WI/mqZxeXn5uq7rN2ma7uXpdLoNyblkh6Io5DjuQNf1gWg0+o2iKPyXqqo3TNM0+7NUKtWGRCLRcbvdyLLs793dXU86nX7mdruxn9/v725sbEwtLi7u9+eJRKINsVisQ5IkkiSJ+Xx+u9FoXOY47p3L5UKSJNHn8x0pinIHAM4LgvDe7pIkiYIgtIHn+Y7T6USn04kjIyNHhmGsWJY1aBjGVVVVV0qlUtCyrAsAAOvr69Msy361+70Bh8OBNpIkT3ief6Oqam1paakoy/IDnuc/lMvlJABAuVzm/H7/ocPhwFgs1oZMJvOQIAj8n7Gxse+bm5tzOzs7MZ/Pd0gQBIqieA8qlUrW5XKdnGXE4/F0aZruEgSBw8PDfyqVShQAADRN2x4aGjo+ywhBEEhRVLdQKJSg/9VqtVg2m707Ozt7/zS5XG67Xq9fse/+AnDURgQylYErAAAAAElFTkSuQmCC",
+				style: "padding: 0px;",
+				onclick: "\
+				var txt = document.getElementById('searchbar').value || getBrowserSelection() || readFromClipboard();\
+				var url = ['https://duckduckgo.com/?q=!ge ', 'https://duckduckgo.com/?q=!tieba ', 'https://encrypted.google.com/#q=site:' + content.location.host + ' '];\
+				gBrowser.selectedTab = gBrowser.addTab(url[event.button] + encodeURIComponent(txt));\
+				",
+				onDOMMouseScroll: "\
+				var txt = document.getElementById('searchbar').value || getBrowserSelection() || readFromClipboard();\
+				if (event.detail > 0) {var url = 'https://duckduckgo.com/?q=!img ';}\
+				else {var url = 'http://image.baidu.com/i?&cl=2&ie=utf-8&oe=utf-8&word=';}\
+				gBrowser.selectedTab = gBrowser.addTab(url + encodeURIComponent(txt));\
+				document.getElementById('AutoSelect-popup').hidePopup();\
+				return;\
+				",
+			}));
+			var SearchPopup = SearchBtn.appendChild($C("menupopup", {
+				style: "-moz-appearance: none; background: -moz-linear-gradient(top, rgb(252, 252, 252) 0%, rgb(245, 245, 245) 33%, rgb(245, 245, 245) 100%); border: 2px solid rgb(144,144,144); border-radius: 5px;"
+			}));
+
+			for (var i = 0; i < this.configs.menuitems.length; i++) {
+				var mi = this.configs.menuitems[i];
+				let miItems = SearchPopup.appendChild($C('menuitem', {
+					label: mi.label,
+					tooltiptext: "左鍵：新分頁前景\n中鍵：此分頁\n右鍵：新分頁背景\n\n❖ 若搜索欄有文字，便搜尋搜索欄文字\n❖ 若搜索欄沒有文字並選取了文字，便搜尋選取文字\n❖ 否則便搜尋剪貼簿中的文字",
+					image: mi.image,
+					class: "menuitem-iconic",
+					url: mi.url,
+					onclick: "SwitchSearch.onClick(event); event.preventDefault(); event.stopPropagation();"
+				}));
 			}
 		},
 		edit: function(aFile) {
@@ -143,9 +182,40 @@ location == "chrome://browser/content/browser.xul" && (function() {
 		log: function() {
 			Application.console.log(Array.slice(arguments));
 		},
+		startup: function() {
+			gBrowser.mPanelContainer.addEventListener("mouseup", function(e) {
+				var eName = e.target.nodeName || e.target.localName || e.target.tagName;
+				if (eName == "TEXTAREA" || eName == "INPUT" || e.target.isContentEditable) return;
+				if (/^about:(blank|newtab|addons|config)/i.test(content.location.toString())) return;
+				if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+				if (e.button == 0 && getBrowserSelection()) {
+					$("AutoSelect-popup").openPopupAtScreen(e.screenX - 60, e.screenY - 40, true);
+					var HideCSS = '\
+						#AutoSelect-menugroup toolbarbutton[state="dblclick"] {display:none!important;}\
+						#AutoSelect-menugroup toolbarbutton[state="select"] {display:block!important;}\
+					'.replace(/[\r\n\t]/g, '');;
+					ASP.style = addStyle(HideCSS);
+				}
+			}, false);
+			gBrowser.mPanelContainer.addEventListener("dblclick", function(e) {
+				if (/^about:(blank|newtab|addons|config)|chrome:\/\/*/i.test(content.location.toString())) return;
+				if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+				if (e.button == 0) {
+					$("AutoSelect-popup").openPopupAtScreen(e.screenX, e.screenY, true);
+					content.document.getSelection().removeAllRanges();
+				}
+				var HideCSS = '\
+					#AutoSelect-menugroup toolbarbutton[state="dblclick"] {display:block!important;}\
+					#AutoSelect-menugroup toolbarbutton[state="select"] {display:none!important;}\
+				'.replace(/[\r\n\t]/g, '');;
+				ASP.style = addStyle(HideCSS);
+			}, false);
+		}
 	};
 	var css = '\
+		#SearchMenu-button dropmarker,\
 		#AutoSelect-popup autorepeatbutton {display:none!important;}\
+		#SearchMenu-button .toolbarbutton-icon {margin:0px 3px;}\
 		#AutoSelect-popup {opacity:0.2!important; -moz-transition:opacity 0.3s ease-out!important;}\
 		#AutoSelect-popup:hover {opacity:1!important; -moz-transition:opacity 0.2s ease-in!important;}\
 		'.replace(/[\r\n\t]/g, '');;
@@ -164,12 +234,4 @@ location == "chrome://browser/content/browser.xul" && (function() {
 		);
 		return document.insertBefore(pi, document.documentElement);
 	}
-	gBrowser.mPanelContainer.addEventListener("mouseup", function(e) {
-		var eName = e.target.nodeName || e.target.localName || e.target.tagName;
-		if (eName == "TEXTAREA" || eName == "INPUT" || e.target.isContentEditable) return;
-		if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
-		if (e.button == 0 && getBrowserSelection()) {
-			$("AutoSelect-popup").openPopupAtScreen(e.screenX - 60, e.screenY - 40, true);
-		}
-	}, false);
 })();
