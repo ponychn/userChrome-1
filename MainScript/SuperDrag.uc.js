@@ -22,13 +22,13 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 					}
 				},
 				D: {
-					name: "下載圖片(不彈窗)",
+					name: "下載圖片 (不彈窗)",
 					cmd: function(event, self) {
 						saveImageURL(event.dataTransfer.getData("application/x-moz-file-promise-url"), null, null, null, true, null, document);
 					}
 				},
 				L: {
-					name: "檢視圖片(新分頁前景)",
+					name: "檢視圖片 (新分頁前景)",
 					cmd: function(event, self) {
 						gBrowser.selectedTab = gBrowser.addTab(event.dataTransfer.getData("application/x-moz-file-promise-url"));
 					}
@@ -48,7 +48,7 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 					}
 				},
 				UD: {
-					name: "尋找 & 高亮關鍵字及複製鏈結文字",
+					name: "尋找、高亮及複製鏈結文字",
 					cmd: function(event, self) {
 						var linkTXT = event.dataTransfer.getData("text/x-moz-url").split("\n")[1];
 						MGs.FindScroll(linkTXT, false);
@@ -56,7 +56,7 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 					}
 				},
 				D: {
-					name: "下載鏈結(不彈窗)",
+					name: "下載鏈結 (不彈窗)",
 					cmd: function(event, self) {
 						saveImageURL(event.dataTransfer.getData("text/x-moz-url").split("\n")[0], null, null, null, true, null, document);
 					}
@@ -90,23 +90,6 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 					}
 				},
 				LR: {
-					name: "Google 加密及百度圖片搜尋及複製鏈結文字",
-					cmd: function(event, self) {
-						var linkTXT = event.dataTransfer.getData("text/x-moz-url").split("\n")[1];
-						gBrowser.selectedTab = gBrowser.addTab('https://duckduckgo.com/?q=!img ' + encodeURIComponent(linkTXT));
-						gBrowser.addTab('http://image.baidu.com/i?&cl=2&ie=utf-8&oe=utf-8&word=' + encodeURIComponent(linkTXT));
-						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(linkTXT);
-					}
-				},
-				LU: {
-					name: "Google 翻譯及複製鏈結文字(新分頁前景)",
-					cmd: function(event, self) {
-						var linkTXT = event.dataTransfer.getData("text/x-moz-url").split("\n")[1];
-						gBrowser.selectedTab = gBrowser.addTab('https://translate.google.com/#auto/zh-TW/' + encodeURIComponent(linkTXT));
-						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(linkTXT);
-					}
-				},
-				LD: {
 					name: "Google 翻譯鏈結文字 (英文)",
 					cmd: function(event, self) {
 						var div = content.document.documentElement.appendChild(content.document.createElement("div"));
@@ -121,7 +104,7 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 								goDoCommand("cmd_paste");
 							}
 							else if (e.button == 2) {
-							gBrowser.selectedTab = gBrowser.addTab('https://translate.google.com/#auto/zh-TW/' + encodeURIComponent(event.dataTransfer.getData("text/x-moz-url").split("\n")[1]));
+							gBrowser.selectedTab = gBrowser.addTab('https://translate.google.com/#auto/en/' + encodeURIComponent(event.dataTransfer.getData("text/x-moz-url").split("\n")[1]));
 							}
 							content.removeEventListener("click", arguments.callee, false);
 							div.parentNode.removeChild(div);
@@ -129,30 +112,22 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 					}
 				},
 				R: {
-					name: "Google 加密搜尋及複製鏈結文字(新分頁前景)",
+					name: "Google 加密搜尋鏈結文字 (新分頁前景)",
 					cmd: function(event, self) {
-						var linkTXT = event.dataTransfer.getData("text/x-moz-url").split("\n")[1];
-						gBrowser.selectedTab = gBrowser.addTab("https://encrypted.google.com/#q=" + encodeURIComponent(linkTXT));
-						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(linkTXT);
+						gBrowser.selectedTab = gBrowser.addTab("https://encrypted.google.com/#q=" + encodeURIComponent(event.dataTransfer.getData("text/x-moz-url").split("\n")[1]));
 					}
 				},
 				RL: {
-					name: "彈出搜索框(新分頁前景)",
+					name: "彈出 AutoSelectPopup",
 					cmd: function(event, self) {
 						Components.classes['@mozilla.org/widget/clipboardhelper;1'].createInstance(Components.interfaces.nsIClipboardHelper).copyString(event.dataTransfer.getData("text/x-moz-url").split("\n")[1]);
-						document.getAnonymousElementByAttribute(document.querySelector('#searchbar').searchButton, 'anonid', 'searchbar-popup').openPopup(null, null, event.screenX, event.screenY);
-					}
-				},
-				RU: {
-					name: "Google 加密站內搜尋及複製鏈結文字(新分頁前景)",
-					cmd: function(event, self) {
-						gBrowser.selectedTab = gBrowser.addTab('https://encrypted.google.com/#q=site:' + content.location.host + ' ' + encodeURIComponent(event.dataTransfer.getData("text/x-moz-url").split("\n")[1]));
+						document.getElementById("AutoSelect-popup").openPopup(null, null, event.screenX, event.screenY);
 					}
 				},
 			},
 			text: {
 				U: {
-					name: "尋找 & 高亮關鍵字及複製選取文字",
+					name: "尋找、高亮及複製選取文字",
 					cmd: function(event, self) {
 						var TXT = event.dataTransfer.getData("text/unicode");
 						MGs.FindScroll(TXT, false);
@@ -160,9 +135,10 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 					}
 				},
 				D: {
-					name: "下載文字(不彈窗)",
+					name: "下載文字 (不彈窗)",
 					cmd: function(event, self) {
-						DownloadText.Select();
+						[/\s(·|::|-|—|»|\|)\s.*/i, /_[^\[\]【】]+$/].forEach(function(r) {content.document.title = content.document.title.replace(r, "");});
+						saveImageURL('data:text/plain;charset=UTF-8;base64,' + btoa(unescape(encodeURIComponent(content.location + '\r\n\r\n' + event.dataTransfer.getData("text/unicode")))), content.document.title + ".txt", null, null, true, null, document);
 					}
 				},
 				L: {
@@ -207,7 +183,7 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 									goDoCommand("cmd_paste");
 								}
 								else if (e.button == 2) {
-								gBrowser.selectedTab = gBrowser.addTab('https://translate.google.com/#auto/zh-TW/' + encodeURIComponent(event.dataTransfer.getData("text/unicode")));
+								gBrowser.selectedTab = gBrowser.addTab('https://translate.google.com/#auto/en/' + encodeURIComponent(event.dataTransfer.getData("text/unicode")));
 								}
 								content.removeEventListener("click", arguments.callee, false);
 								div.parentNode.removeChild(div);
@@ -216,16 +192,16 @@ location == "chrome://browser/content/browser.xul" && (function(event) {
 					}
 				},
 				R: {
-					name: "Google 加密搜尋選取文字[識別URL並打開](新分頁前景)",
+					name: "Google 加密搜尋選取文字[識別URL並打開] (新分頁前景)",
 					cmd: function(event, self) {
 						var TXT = event.dataTransfer.getData("text/unicode");
 						(/^\s*(?:(?:(?:ht|f)tps?:\/\/)?(?:(?:\w+?)(?:\.(?:[\w-]+?))*(?:\.(?:[a-zA-Z]{2,5}))|(?:(?:\d+)(?:\.\d+){3}))(?::\d{2,5})?(?:\/\S*|$)|data:(text|image)\/[\u0025-\u007a]+)\s*$/.test(TXT) && (gBrowser.selectedTab = gBrowser.addTab(TXT))) || (gBrowser.selectedTab = gBrowser.addTab("https://encrypted.google.com/#q=" + encodeURIComponent(TXT)));
 					}
 				},
 				RL: {
-					name: "彈出搜索框(新分頁前景)",
+					name: "彈出 AutoSelectPopup",
 					cmd: function(event, self) {
-						document.getAnonymousElementByAttribute(document.querySelector('#searchbar').searchButton, 'anonid', 'searchbar-popup').openPopup(null, null, event.screenX, event.screenY);
+						document.getElementById("AutoSelect-popup").openPopup(null, null, event.screenX, event.screenY);
 					}
 				},
 			},
