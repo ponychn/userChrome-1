@@ -7,13 +7,19 @@ GESTURES = {
 		}
 	},
 	'D': {
-		name: '跳過緩存重新載入此分頁',
+		name: '全選 & 刪除 / 跳過緩存重新載入此分頁',
 		cmd: function() {
-			BrowserReloadSkipCache();
+			var focused = document.commandDispatcher.focusedElement;
+			if (focused) {
+				goDoCommand("cmd_selectAll");
+				goDoCommand("cmd_delete");
+			}
+			else {BrowserReloadSkipCache();}
+			return;
 		}
 	},
 	'L': {
-		name: '上一頁(後退)',
+		name: '上一頁 (後退)',
 		cmd: function(gestures, event) {
 			var nav = gBrowser.webNavigation;
 			if (nav.canGoBack) {nav.goBack();}
@@ -30,7 +36,7 @@ GESTURES = {
 		}
 	},
 	'R': {
-		name: '下一頁(前進)',
+		name: '下一頁 (前進)',
 		cmd: function(gestures, event) {
 			var nav = gBrowser.webNavigation;
 			if (nav.canGoForward) {nav.goForward();}
@@ -99,7 +105,7 @@ GESTURES = {
 		}
 	},
 	'L<R': {
-		name: '貼上 / 高亮 / 複製頁面全部文字 / 重設(默認)',
+		name: '貼上 / 高亮 / 複製頁面全部文字 / 重設 (默認)',
 		cmd: function() {
 			var txt = document.getElementById("searchbar").value;
 			if (txt == "") {
@@ -139,7 +145,7 @@ GESTURES = {
 	'DU': {
 		name: '啟用 / 停用 dTa 單鍵下載選擇器',
 		cmd: function() {
-			dTaTurboSelect.Toggle();
+			MGs.dTaBtn("dta-turboselect-button"); // "dta-manager-button", "dta-button", "dta-turbo-button"
 		}
 	},
 	'LR': {
