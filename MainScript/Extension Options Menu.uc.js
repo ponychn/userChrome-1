@@ -9,6 +9,7 @@
 /*
 按鈕圖標
 左鍵：擴展及插件選單
+中鍵：啟用 / 停用 DOM & Element Inspector (重新啟動瀏覽器)
 右鍵：打開擴展管理員
 
 擴展
@@ -45,10 +46,7 @@ CTRL + 右鍵：移除擴展
 					id: 'eom-button',
 					type: 'menu',
 					class: 'toolbarbutton-1',
-					image: this.ICON_URL,
-					tooltiptext: '左鍵：擴展及插件選單\n右鍵：打開擴展管理員',
-					onclick: 'EOM.iconClick(event);',
-					style: 'padding: 0px; margin: -1px -1px 0px -4px; -moz-transform: scale(0.875);'
+					style: 'padding: 0px; margin: -1px -1px 0px -1px; -moz-transform: scale(0.875);'
 				}));
 			}
 			else if (EOM.BUTTON_TYPE == 2) {
@@ -56,9 +54,11 @@ CTRL + 右鍵：移除擴展
 					id: 'eom-menu',
 					label: '擴展及插件管理器',
 					class: 'menu-iconic',
-					image: this.ICON_URL,
 				}), $("menu_preferences"));
 			}
+			btn.setAttribute('tooltiptext', '左鍵：擴展及插件選單\n中鍵：啟用 / 停用 DOM & Element Inspector (重新啟動瀏覽器)\n右鍵：打開擴展管理員');
+			btn.setAttribute('image', this.ICON_URL);
+			btn.setAttribute('onclick', 'EOM.iconClick(event);');
 
 			var mp = btn.appendChild($C('menupopup', {
 				id: 'eom-button-popup',
@@ -151,10 +151,13 @@ CTRL + 右鍵：移除擴展
 			}
 
 			var menusep = popup.insertBefore($C('menuseparator'), popup.firstChild);
-			var menugroup = popup.insertBefore($C("menugroup"), menusep);
+			var menugroup = popup.insertBefore($C("menugroup", {
+				id: "eom-menugroup"
+			}), menusep);
 
 			for (let i = 0, menu; menu = mMenus[i]; i++) {
 				let menuItem = menugroup.appendChild($C("menuitem", {
+					label: menu.alabel,
 					tooltiptext: menu.label,
 					image: menu.image,
 					class: "menuitem-iconic",
@@ -166,6 +169,9 @@ CTRL + 右鍵：移除擴展
 
 		iconClick: function(event) {
 			switch (event.button) {
+			case 1:
+				EOM.DOMEI(event);
+				break;
 			case 2:
 				gBrowser.selectedTab = gBrowser.addTab('about:addons');
 				event.preventDefault();
@@ -178,11 +184,11 @@ CTRL + 右鍵：移除擴展
 			var AddonIDs = [
 				'inspector@mozilla.org',
 				'InspectElement@zbinlin',
-				]
-			for(n=0; n<AddonIDs.length; n++) {
-			AddonManager.getAddonByID(AddonIDs[n], function(addon) {
-				addon.userDisabled = addon.userDisabled ? false : true;
-			});
+				];
+			for(n = 0; n < AddonIDs.length; n++) {
+				AddonManager.getAddonByID(AddonIDs[n], function(addon) {
+					addon.userDisabled = addon.userDisabled ? false : true;
+				});
 			}
 			Application.restart();
 		},
@@ -293,15 +299,11 @@ CTRL + 右鍵：移除擴展
 	};
 	var mMenus = [
 		{
-			label: '重新啟動瀏覽器並清除 startupCache',
+			alabel: '重新啟動瀏覽器',
+			label: '清除 startupCache',
 			image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACgElEQVQ4jY2RfUzMARjHv7tODnmJOxGm3LnKe3fnoh+W184ypjmZpZrQFLOSstns5g/cIXq9fuqQUd4tx0jFcLVRrSxNNE2bsUYY5Sr09Y9u2Nz6/vk83+ez5/s8gBvFAbKCUKw7Hz6o3KrDDHfev5Qmx/BCAVvKklR1b8rSWHMovM+ignJAw6IeEZU7FC3tNxeSjWvJF8l8Z0/tu5eyqKloiWd6MjDELcCqg/5hqk8bm8LIulCyQiCrjGRVCjuupbN04+Tygyoo3EIypkNVluDd0OsIJe+F8KV5IjtFFXkhnM7iRF5eM+aaEfBwDeTpEGDVQcgLwTyTAl4AIGqhrNg+uvlzaTBti3D0nEGa2W6ZRNoW87VpAfPnwuAC2I1eLa3FMT8cphVOUQtNfz1XA1XJqkH3bQJWAkBJhMcZ54mp/Hl4Fq8aPM+5AFUxsi42JLFR3PwtQ40J/ySShAHS31sFPt873smjKjqihr5yOSo3DH7NO2vZkm/8njUb+v/dJg6Q1e6Sv2FOIOs3jfzqalxYjlM/CrXsvrWVxSs9TwFAjh7q0wKsohbyft8RJcZWJ4zp+nTAj4/WD/v45+vCWtN9SHsk2zINLJiPvVYdNjRbo2mP9X9i8cM4ADAp4FUoINYmIP6kgNV/5bwaIS3tOaEmr0Tybe5qPtg553N3dRa/1Yi8ETvNYQ6A7/+iAQDMAfC9bZQ97jT7k0ULyevR5KUo8qzAnrt7WJ6oeSpqMdMtRNRCXrJMkl27bWTHh/3jfzJDSWb4s/eYmg37QliwALvdAvplCcJUR8yI953mKayP9/5ycRls2cHQAZAMCGDyw6grBumz4qUS83ENgtx5fwEzyhRmLMK7zwAAAABJRU5ErkJggg==",
 			oncommand: "Services.appinfo.invalidateCachesOnRestart() || Application.restart();",
-			style: "margin-left: 30px; max-width: 10px;"
-		},
-		{
-			label: '啟用 / 停用 DOM & Element Inspector (重新啟動瀏覽器)',
-			image: "chrome://mozapps/skin/extensions/extensionGeneric-16.png",
-			oncommand: "EOM.DOMEI(event);"
+			style: "min-width: 358px;"
 		},
 		{
 			label: "打開擴展目錄",
@@ -316,6 +318,7 @@ CTRL + 右鍵：移除擴展
 	];
 	var css = '\
 		#eom-button dropmarker {display:none;}\
+		#eom-menugroup .menu-iconic-icon {margin-left:2px;}\
 		.addon-disabled > .menu-iconic-left {filter:url("chrome://mozapps/skin/extensions/extensions.svg#greyscale")}\
 		.addon-disabled label {opacity:0.8;}\
 		.addon-disabled label:after {content:"*";}\
