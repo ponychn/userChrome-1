@@ -46,7 +46,7 @@
 		}, false);
 
 		var WebScreenShot = {
-			capture : function(win, x, y, width, height, isCopy){
+			capture : function(win, x, y, width, height, isCopy) {
 				var mainWindow = document.getElementById('main-window');
 				var scrollbox = document.createElement('scrollbox');
 				scrollbox.width = '1';
@@ -65,7 +65,7 @@
 				ctx.drawWindow(win, x, y, width, height, "rgb(255,255,255)");
 				ctx.restore();
 
-				saveImageURL(canvas.toDataURL(), "Capture_" + ".png",  null, null, null, null, document);
+				saveImageURL(canvas.toDataURL(), "Capture_" + WebScreenShot.getDateTime() + ".png",  null, null, true, null, document);
 			},
 			capturePage: function() {
 				var canvas = document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
@@ -73,7 +73,7 @@
 				canvas.height = content.innerHeight;
 				var ctx = canvas.getContext("2d");
 				ctx.drawWindow(content, content.pageXOffset, content.pageYOffset, canvas.width, canvas.height, "rgb(255,255,255)");
-				saveImageURL(canvas.toDataURL(), "CapturePage_" + ".png",  null, null, null, null, document);
+				saveImageURL(canvas.toDataURL(), "CapturePage_" + WebScreenShot.getDateTime() + ".png",  null, null, true, null, document);
 			},
 			captureAll: function() {
 				var canvas = document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
@@ -81,7 +81,7 @@
 				canvas.height = content.document.documentElement.scrollHeight;
 				var ctx = canvas.getContext("2d");
 				ctx.drawWindow(content, 0, 0, canvas.width, canvas.height, "rgb(255,255,255)");
-				saveImageURL(canvas.toDataURL(), "CaptureAll_" + ".png",  null, null, null, null, document);
+				saveImageURL(canvas.toDataURL(), "CaptureAll_" + WebScreenShot.getDateTime() + ".png",  null, null, true, null, document);
 			},
 			captureBrower: function() {
 				var canvas = document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
@@ -89,17 +89,21 @@
 				canvas.height = innerHeight;
 				var ctx = canvas.getContext("2d");
 				ctx.drawWindow(window, 0, 0, canvas.width, canvas.height, "rgb(255,255,255)");
-				saveImageURL(canvas.toDataURL(), "CaptureBrower_" + ".png",  null, null, null, null, document);
+				saveImageURL(canvas.toDataURL(), "CaptureBrower_" + WebScreenShot.getDateTime() + ".png",  null, null, true, null, document);
 			},
+			getDateTime: function() {
+				var now = new Date();
+				return now.toLocaleFormat("%Y.%m.%d_%H%M%S");
+			}
 		};
 
 		var WebScreenShotByClipping = {
 			capture : WebScreenShot.capture,
-			handleEvent : function(event){
+			handleEvent : function(event) {
 				if (event.button != 0) return false;
 				event.preventDefault();
 				event.stopPropagation();
-				switch(event.type){
+				switch(event.type) {
 					case 'mousedown':
 						this.downX = event.pageX;
 						this.downY = event.pageY;
@@ -122,12 +126,12 @@
 						break;
 				}
 			},
-			init : function(){
+			init : function() {
 				this.win = document.commandDispatcher.focusedWindow;
 				if (this.win == window) this.win = content;
 				this.doc = this.win.document;
 				this.body = this.doc.body;
-				if (!this.body instanceof HTMLBodyElement){
+				if (!this.body instanceof HTMLBodyElement) {
 					alert("不能截圖"); //Cannot capture.
 					return false;
 				}
@@ -144,7 +148,7 @@
 				this.doc.addEventListener('mouseup', this ,true);
 				this.doc.addEventListener('click', this, true);
 			},
-			uninit : function(){
+			uninit : function() {
 				var pos = [this.win, parseInt(this.bs.left), parseInt(this.bs.top), parseInt(this.bs.width), parseInt(this.bs.height)];
 				this.doc.removeEventListener('mousedown', this, true);
 				this.doc.removeEventListener('mousemove', this, true);
@@ -158,7 +162,7 @@
 
 		var WebScreenShotByClick = {
 			capture : WebScreenShot.capture,
-			getPosition : function(){
+			getPosition : function() {
 				var html = this.doc.documentElement;
 				var body = this.doc.body;
 				var rect = this.target.getBoundingClientRect();
@@ -170,16 +174,16 @@
 					, parseInt(rect.height)
 				];
 			},
-			highlight : function(){
+			highlight : function() {
 				this.orgStyle = this.target.hasAttribute('style')? this.target.style.cssText : false;
 				this.target.style.cssText += 'outline: red 2px solid; outline-offset: 2px; -moz-outline-radius: 2px;';
 			},
-			lowlight : function(){
+			lowlight : function() {
 				if (this.orgStyle) this.target.style.cssText = this.orgStyle;
 				else this.target.removeAttribute('style'); 
 			},
-			handleEvent : function(event){
-				switch(event.type){
+			handleEvent : function(event) {
+				switch(event.type) {
 					case 'click':
 						if (event.button != 0) return;
 						event.preventDefault();
@@ -196,13 +200,13 @@
 						break;
 				}
 			},
-			init : function(){
+			init : function() {
 				this.win = content;
 				this.doc = content.document;
 				this.doc.addEventListener('mouseover', this, true);
 				this.doc.addEventListener('click', this, true);
 			},
-			uninit : function(){
+			uninit : function() {
 				this.doc.removeEventListener('mouseover', this, true);
 				this.doc.removeEventListener('click', this, true);
 			},
@@ -303,7 +307,7 @@
 				});
 			},
 			resetCursor: function() {
-				this.rootList.forEach(function(root){
+				this.rootList.forEach(function(root) {
 					if (root)
 					root.style.setProperty('cursor', '', '');
 				});
