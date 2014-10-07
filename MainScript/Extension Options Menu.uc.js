@@ -46,7 +46,7 @@ CTRL + 右鍵：移除擴展
 					id: 'eom-button',
 					type: 'menu',
 					class: 'toolbarbutton-1',
-					style: 'padding: 0px; margin: -1px -1px 0px -1px; -moz-transform: scale(0.875);'
+					style: '-moz-transform: scale(0.875);'
 				}));
 			}
 			else if (EOM.BUTTON_TYPE == 2) {
@@ -318,12 +318,13 @@ CTRL + 右鍵：移除擴展
 	];
 	var css = '\
 		#eom-button dropmarker {display:none;}\
+		#eom-button, #eom-button > .toolbarbutton-icon {padding:0!important;}\
 		#eom-menugroup .menu-iconic-icon {margin-left:2px;}\
 		.addon-disabled > .menu-iconic-left {filter:url("chrome://mozapps/skin/extensions/extensions.svg#greyscale")}\
 		.addon-disabled label {opacity:0.8;}\
-		.addon-disabled label:after {content:"*";}\
+		.addon-disabled label:after {content:"停用";}\
 		.addon-uninstall label {font-weight:bold!important;}\
-		.addon-uninstall label:after {content:"-";}\
+		.addon-uninstall label:after {content:"移除";}\
 		'.replace(/[\r\n\t]/g, '');;
 	EOM.style = addStyle(css);
 	EOM.init();
