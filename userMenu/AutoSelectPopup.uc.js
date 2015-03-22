@@ -28,6 +28,11 @@ location == "chrome://browser/content/browser.xul" && (function() {
 				command: "cmd_copy",
 				style: "-moz-appearance: none;"
 			}));
+			var ctrlVitem = ASPopup.appendChild($C("menuitem", {
+				accesskey: "V",
+				command: "cmd_paste",
+				style: "-moz-appearance: none;"
+			}));
 			var menuitem = $('devToolsSeparator').parentNode.insertBefore($C('menuitem', {
 				id: 'ASP-menuitem',
 				label: 'AutoSelectPopup',
@@ -38,6 +43,13 @@ location == "chrome://browser/content/browser.xul" && (function() {
 
 			setTimeout(function() {ASP.rebuild();}, 1000);
 			ASP.startup();
+			ASPopup.addEventListener("popuphidden", function() {
+				var select = getBrowserSelection();
+				if (select) {
+					goDoCommand("cmd_copy");
+					XULBrowserWindow.statusTextField.label = '已複製：「' + readFromClipboard() + '」';
+				}
+			}, false);
 		},
 		rebuild: function(isAlert) {
 			var aFile = this.FILE;
@@ -109,7 +121,7 @@ location == "chrome://browser/content/browser.xul" && (function() {
 				style: "padding: 0px;",
 				onclick: "\
 				var txt = document.getElementById('searchbar').value || getBrowserSelection() || readFromClipboard();\
-				var url = ['https://duckduckgo.com/?q=!ge ', 'https://duckduckgo.com/?q=!tieba ', 'https://encrypted.google.com/#q=site:' + content.location.host + ' '];\
+				var url = ['https://encrypted.google.com/#q=', 'http://tieba.baidu.com/f?ie=utf-8&kw=', 'https://encrypted.google.com/#q=site:' + content.location.host + ' '];\
 				gBrowser.selectedTab = gBrowser.addTab(url[event.button] + encodeURIComponent(txt));\
 				",
 				onDOMMouseScroll: "\
@@ -209,6 +221,30 @@ location == "chrome://browser/content/browser.xul" && (function() {
 					#AutoSelect-menugroup toolbarbutton[state="select"] {display:none!important;}\
 				'.replace(/[\r\n\t]/g, '');;
 				ASP.style = addStyle(HideCSS);
+			}, false);
+			gBrowser.mPanelContainer.addEventListener("mousemove", function(e) {
+				if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+				if (e.button == 0 && getBrowserSelection()) {
+					function countNonAlphabet(str) {
+						var m = str.match(/[^\x00-\x80]/g);
+						return (!m?0:m.length);
+					}
+					function countAlphabetWord(str) {
+						var m = str.match(/\b[\w-]+\b/g);
+						return (!m?0:m.length);
+					}
+					function countNonSpaceChar(str) {
+						var m = str.match(/\S/g);
+						return (!m?0:m.length);
+					}
+
+					var string = content.getSelection().toString();
+					var nonAlphabetNum = countNonAlphabet(string);
+					var alphabetWordNum = countAlphabetWord(string);
+					var wordNum = nonAlphabetNum + alphabetWordNum;
+					var nonSpaceCharNum = countNonSpaceChar(string);
+					XULBrowserWindow.statusTextField.label = '英文字數：' + wordNum + ' | 中文字數：' + nonSpaceCharNum;
+				}
 			}, false);
 		}
 	};
