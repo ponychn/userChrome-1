@@ -5,7 +5,7 @@
 // @note           17.09.2014 - 新增搜索菜單按鈕
 // @note           12.09.2014 - 新增翻譯功能 (P.S. 翻譯字數約 200 字)
 // @note           07.09.2014 - 修改為配置外置版
-// @note           31.07.2014 - 新增按住 C / Ctrl + C 便複製，及按住 V / Ctrl + V 便貼上
+// @note           31.07.2014 - 新增按住 C / Ctrl + C 便複製，按住 V / Ctrl + V 便貼上，及按住 F / Ctrl + F 便尋找
 // @note           29.07.2014 - 新增限制條件，分別為於輸入框內或當按住 Ctrl/Shift/Alt 時
 // @note           28.07.2014 - 選取文字後自動彈出自定選單
 // @homepageURL    https://github.com/Drager-oos/userChrome/blob/master/userMenu/AutoSelectPopup.uc.js
@@ -37,6 +37,11 @@ location == "chrome://browser/content/browser.xul" && (function() {
 			var ctrlVitem = ASPopup.appendChild($C("menuitem", {
 				accesskey: "V",
 				command: "cmd_paste",
+				style: "-moz-appearance: none;"
+			}));
+			var ctrlFitem = ASPopup.appendChild($C("menuitem", {
+				accesskey: "F",
+				command: "cmd_find",
 				style: "-moz-appearance: none;"
 			}));
 			var menuitem = $('devToolsSeparator').parentNode.insertBefore($C('menuitem', {
