@@ -1,7 +1,13 @@
 // ==UserScript==
 // @name           AutoSelectPopup.uc.js
-// @description    當雙擊頁面 / 選取文字後，便自動彈出自定選單，按住 C / Ctrl + C 便複製
-// @note           配置外置版
+// @note           22.03.2015 - 新增自動複製及統計選取字數
+// @note           20.09.2014 - 新增雙擊頁面觸發彈出，及添加 state 區分按鈕出現條件和在部分網頁不觸發
+// @note           17.09.2014 - 新增搜索菜單按鈕
+// @note           12.09.2014 - 新增翻譯功能 (P.S. 翻譯字數約 200 字)
+// @note           07.09.2014 - 修改為配置外置版
+// @note           31.07.2014 - 新增按住 C / Ctrl + C 便複製，及按住 V / Ctrl + V 便貼上
+// @note           29.07.2014 - 新增限制條件，分別為於輸入框內或當按住 Ctrl/Shift/Alt 時
+// @note           28.07.2014 - 選取文字後自動彈出自定選單
 // @homepageURL    https://github.com/Drager-oos/userChrome/blob/master/userMenu/AutoSelectPopup.uc.js
 // ==/UserScript==
 
