@@ -60,13 +60,6 @@ location == "chrome://browser/content/browser.xul" && (function() {
 
 			setTimeout(function() {ASP.rebuild();}, 1000);
 			ASP.startup();
-			ASPopup.addEventListener("popuphidden", function() {
-				var select = getBrowserSelection();
-				if (select) {
-					goDoCommand("cmd_copy");
-					XULBrowserWindow.statusTextField.label = '已複製：「' + readFromClipboard() + '」';
-				}
-			}, false);
 		},
 		rebuild: function(isAlert) {
 			var aFile = this.FILE;
