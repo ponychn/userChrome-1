@@ -23,7 +23,13 @@ location == "chrome://browser/content/browser.xul" && (function() {
 		init: function() {
 			var ASPopup = $("mainPopupSet").appendChild($C("menupopup", {
 				id: "AutoSelect-popup",
-				style: "-moz-appearance: none; background: -moz-linear-gradient(top, rgb(252, 252, 252) 0%, rgb(245, 245, 245) 33%, rgb(245, 245, 245) 100%); border: 2px solid rgb(144,144,144); border-radius: 5px;"
+				style: "-moz-appearance: none; background: -moz-linear-gradient(top, rgb(252, 252, 252) 0%, rgb(245, 245, 245) 33%, rgb(245, 245, 245) 100%); border: 2px solid rgb(144,144,144); border-radius: 5px;",
+				onpopupshown: "\
+				var select = getBrowserSelection();\
+				if (select) {\
+					goDoCommand('cmd_copy');\
+					XULBrowserWindow.statusTextField.label = '已複製：「' + readFromClipboard() + '」';\
+				}"
 			}));
 			var ASPMG = ASPopup.appendChild($C("menugroup", {
 				id: "AutoSelect-menugroup",
