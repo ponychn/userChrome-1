@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name           AutoSelectPopup.uc.js
+// @note           28.03.2015 - 新增部份快捷鍵 (F:定位到 findbar, T:新分頁前景, H:高亮, S: 定位到 searchbar, U:定位到 urlbar)
 // @note           22.03.2015 - 新增自動複製及統計選取字數
 // @note           20.09.2014 - 新增雙擊頁面觸發彈出，及添加 state 區分按鈕出現條件和在部分網頁不觸發
 // @note           17.09.2014 - 新增搜索菜單按鈕
 // @note           12.09.2014 - 新增翻譯功能 (P.S. 翻譯字數約 200 字)
 // @note           07.09.2014 - 修改為配置外置版
-// @note           31.07.2014 - 新增按住 C / Ctrl + C 便複製，按住 V / Ctrl + V 便貼上，及按住 F / Ctrl + F 便尋找
+// @note           31.07.2014 - 新增按住 C / Ctrl + C 便複製，及按住 V / Ctrl + V 便貼上
 // @note           29.07.2014 - 新增限制條件，分別為於輸入框內或當按住 Ctrl/Shift/Alt 時
 // @note           28.07.2014 - 選取文字後自動彈出自定選單
 // @homepageURL    https://github.com/Drager-oos/userChrome/blob/master/userMenu/AutoSelectPopup.uc.js
@@ -38,17 +39,30 @@ location == "chrome://browser/content/browser.xul" && (function() {
 			var ctrlCitem = ASPopup.appendChild($C("menuitem", {
 				accesskey: "C",
 				command: "cmd_copy",
-				style: "-moz-appearance: none;"
 			}));
 			var ctrlVitem = ASPopup.appendChild($C("menuitem", {
 				accesskey: "V",
 				command: "cmd_paste",
-				style: "-moz-appearance: none;"
 			}));
 			var ctrlFitem = ASPopup.appendChild($C("menuitem", {
 				accesskey: "F",
 				command: "cmd_find",
-				style: "-moz-appearance: none;"
+			}));
+			var ctrlTitem = ASPopup.appendChild($C("menuitem", {
+				accesskey: "T",
+				oncommand: "gBrowser.selectedTab = gBrowser.addTab(encodeURIComponent(getBrowserSelection() || readFromClipboard()));",
+			}));
+			var ctrlHitem = ASPopup.appendChild($C("menuitem", {
+				accesskey: "H",
+				oncommand: "gWHT.addWord(getBrowserSelection() || readFromClipboard());",
+			}));
+			var ctrlSitem = ASPopup.appendChild($C("menuitem", {
+				accesskey: "S",
+				oncommand: "var bar = document.getElementById('searchbar'); bar.value = getBrowserSelection() || readFromClipboard(); bar.focus();",
+			}));
+			var ctrlUitem = ASPopup.appendChild($C("menuitem", {
+				accesskey: "U",
+				oncommand: "var bar = document.getElementById('urlbar'); bar.value = getBrowserSelection() || readFromClipboard(); bar.focus();",
 			}));
 			var menuitem = $('devToolsSeparator').parentNode.insertBefore($C('menuitem', {
 				id: 'ASP-menuitem',
@@ -260,7 +274,8 @@ location == "chrome://browser/content/browser.xul" && (function() {
 	};
 	var css = '\
 		#SearchMenu-button dropmarker,\
-		#AutoSelect-popup autorepeatbutton {display:none!important;}\
+		#AutoSelect-popup autorepeatbutton {display:none;}\
+		#AutoSelect-popup menuitem:not([class="menuitem-iconic"]) {-moz-appearance:none;}\
 		#SearchMenu-button .toolbarbutton-icon {margin:0px 3px;}\
 		#AutoSelect-popup {opacity:0.2!important; -moz-transition:opacity 0.3s ease-out!important;}\
 		#AutoSelect-popup:hover {opacity:1!important; -moz-transition:opacity 0.2s ease-in!important;}\
