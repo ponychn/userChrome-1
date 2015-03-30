@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           AutoSelectPopup.uc.js
-// @note           28.03.2015 - 新增部份快捷鍵 (F:定位到 findbar, T:新分頁前景, H:高亮, S: 定位到 searchbar, U:定位到 urlbar)
+// @note           28.03.2015 - 新增部份快捷鍵 (F:定位到 findbar, T:新分頁前景, G: Google 加密, H:高亮, S: 定位到 searchbar, U:定位到 urlbar)
 // @note           22.03.2015 - 新增自動複製及統計選取字數
 // @note           20.09.2014 - 新增雙擊頁面觸發彈出，及添加 state 區分按鈕出現條件和在部分網頁不觸發
 // @note           17.09.2014 - 新增搜索菜單按鈕
@@ -36,41 +36,45 @@ location == "chrome://browser/content/browser.xul" && (function() {
 				id: "AutoSelect-menugroup",
 				onclick: "document.getElementById('AutoSelect-popup').hidePopup();"
 			}));
-			var ctrlCitem = ASPopup.appendChild($C("menuitem", {
+			var KeyC = ASPopup.appendChild($C("menuitem", {
 				accesskey: "C",
 				command: "cmd_copy",
 			}));
-			var ctrlVitem = ASPopup.appendChild($C("menuitem", {
+			var KeyV = ASPopup.appendChild($C("menuitem", {
 				accesskey: "V",
 				command: "cmd_paste",
 			}));
-			var ctrlFitem = ASPopup.appendChild($C("menuitem", {
+			var KeyF = ASPopup.appendChild($C("menuitem", {
 				accesskey: "F",
 				command: "cmd_find",
 			}));
-			var ctrlTitem = ASPopup.appendChild($C("menuitem", {
+			var KeyT = ASPopup.appendChild($C("menuitem", {
 				accesskey: "T",
-				oncommand: "gBrowser.selectedTab = gBrowser.addTab(encodeURIComponent(getBrowserSelection() || readFromClipboard()));",
+				oncommand: "gBrowser.selectedTab = gBrowser.addTab(getBrowserSelection() || readFromClipboard());",
 			}));
-			var ctrlHitem = ASPopup.appendChild($C("menuitem", {
+			var KeyG = ASPopup.appendChild($C("menuitem", {
+				accesskey: "G",
+				oncommand: "gBrowser.selectedTab = gBrowser.addTab('https://encrypted.google.com/#q=' + encodeURIComponent(getBrowserSelection() || readFromClipboard()));",
+			}));
+			var KeyH = ASPopup.appendChild($C("menuitem", {
 				accesskey: "H",
 				oncommand: "gWHT.addWord(getBrowserSelection() || readFromClipboard());",
 			}));
-			var ctrlSitem = ASPopup.appendChild($C("menuitem", {
+			var KeyS = ASPopup.appendChild($C("menuitem", {
 				accesskey: "S",
 				oncommand: "var bar = document.getElementById('searchbar'); bar.value = getBrowserSelection() || readFromClipboard(); bar.focus();",
 			}));
-			var ctrlUitem = ASPopup.appendChild($C("menuitem", {
+			var KeyU = ASPopup.appendChild($C("menuitem", {
 				accesskey: "U",
 				oncommand: "var bar = document.getElementById('urlbar'); bar.value = getBrowserSelection() || readFromClipboard(); bar.focus();",
 			}));
-			var menuitem = $('devToolsSeparator').parentNode.insertBefore($C('menuitem', {
+/*			var menuitem = $('devToolsSeparator').parentNode.insertBefore($C('menuitem', {
 				id: 'ASP-menuitem',
 				label: 'AutoSelectPopup',
 				tooltiptext: '左鍵：重載配置\n右鍵：編輯配置',
 				oncommand: 'setTimeout(function() {ASP.rebuild(true);}, 10);',
 				onclick: 'if (event.button == 2) {event.preventDefault(); ASP.edit(ASP.FILE);}'
-			}), $('devToolsSeparator'));
+			}), $('devToolsSeparator'));*/
 
 			setTimeout(function() {ASP.rebuild();}, 1000);
 			ASP.startup();
