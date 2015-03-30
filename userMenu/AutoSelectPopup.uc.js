@@ -68,13 +68,13 @@ location == "chrome://browser/content/browser.xul" && (function() {
 				accesskey: "U",
 				oncommand: "var bar = document.getElementById('urlbar'); bar.value = getBrowserSelection() || readFromClipboard(); bar.focus();",
 			}));
-/*			var menuitem = $('devToolsSeparator').parentNode.insertBefore($C('menuitem', {
+			var menuitem = $('devToolsSeparator').parentNode.insertBefore($C('menuitem', {
 				id: 'ASP-menuitem',
 				label: 'AutoSelectPopup',
 				tooltiptext: '左鍵：重載配置\n右鍵：編輯配置',
 				oncommand: 'setTimeout(function() {ASP.rebuild(true);}, 10);',
 				onclick: 'if (event.button == 2) {event.preventDefault(); ASP.edit(ASP.FILE);}'
-			}), $('devToolsSeparator'));*/
+			}), $('devToolsSeparator'));
 
 			setTimeout(function() {ASP.rebuild();}, 1000);
 			ASP.startup();
