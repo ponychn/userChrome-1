@@ -60,7 +60,7 @@ function HideFirefox() {
 };
 
 var WebScreenShot = {
-	capture : function(win, x, y, width, height, isCopy){
+	capture : function(win, x, y, width, height, isCopy) {
 		var mainWindow = document.getElementById('main-window');
 		var scrollbox = document.createElement('scrollbox');
 		scrollbox.width = '1';
@@ -85,11 +85,11 @@ var WebScreenShot = {
 
 var WebScreenShotByClipping = {
 	capture : WebScreenShot.capture,
-	handleEvent : function(event){
+	handleEvent : function(event) {
 		if (event.button != 0) return false;
 		event.preventDefault();
 		event.stopPropagation();
-		switch(event.type){
+		switch(event.type) {
 			case 'mousedown':
 				this.downX = event.pageX;
 				this.downY = event.pageY;
@@ -112,12 +112,12 @@ var WebScreenShotByClipping = {
 				break;
 		}
 	},
-	init : function(){
+	init : function() {
 		this.win = document.commandDispatcher.focusedWindow;
 		if (this.win == window) this.win = content;
 		this.doc = this.win.document;
 		this.body = this.doc.body;
-		if (!this.body instanceof HTMLBodyElement){
+		if (!this.body instanceof HTMLBodyElement) {
 			alert("不能截圖"); //Cannot capture.
 			return false;
 		}
@@ -134,7 +134,7 @@ var WebScreenShotByClipping = {
 		this.doc.addEventListener('mouseup', this ,true);
 		this.doc.addEventListener('click', this, true);
 	},
-	uninit : function(){
+	uninit : function() {
 		var pos = [this.win, parseInt(this.bs.left), parseInt(this.bs.top), parseInt(this.bs.width), parseInt(this.bs.height)];
 		this.doc.removeEventListener('mousedown', this, true);
 		this.doc.removeEventListener('mousemove', this, true);
@@ -148,7 +148,7 @@ var WebScreenShotByClipping = {
 
 var WebScreenShotByClick = {
 	capture : WebScreenShot.capture,
-	getPosition : function(){
+	getPosition : function() {
 		var html = this.doc.documentElement;
 		var body = this.doc.body;
 		var rect = this.target.getBoundingClientRect();
@@ -160,16 +160,16 @@ var WebScreenShotByClick = {
 			, parseInt(rect.height)
 		];
 	},
-	highlight : function(){
+	highlight : function() {
 		this.orgStyle = this.target.hasAttribute('style')? this.target.style.cssText : false;
 		this.target.style.cssText += 'outline: red 2px solid; outline-offset: 2px; -moz-outline-radius: 2px;';
 	},
-	lowlight : function(){
+	lowlight : function() {
 		if (this.orgStyle) this.target.style.cssText = this.orgStyle;
 		else this.target.removeAttribute('style'); 
 	},
-	handleEvent : function(event){
-		switch(event.type){
+	handleEvent : function(event) {
+		switch(event.type) {
 			case 'click':
 				if (event.button != 0) return;
 				event.preventDefault();
@@ -186,13 +186,13 @@ var WebScreenShotByClick = {
 				break;
 		}
 	},
-	init : function(){
+	init : function() {
 		this.win = content;
 		this.doc = content.document;
 		this.doc.addEventListener('mouseover', this, true);
 		this.doc.addEventListener('click', this, true);
 	},
-	uninit : function(){
+	uninit : function() {
 		this.doc.removeEventListener('mouseover', this, true);
 		this.doc.removeEventListener('click', this, true);
 	},
@@ -351,31 +351,6 @@ var MGs = {
 			theBrowser.selectedTab = newTab;
 		}
 	},
-};
-var SwitchSearch = {
-	onClick: function(event) {
-		var x = document.getElementById('searchbar').value || getBrowserSelection() || readFromClipboard(),
-			label = event.target.getAttribute('label'),
-			url = event.target.getAttribute('url');
-		document.getElementById('searchbar').value = "";
-		if (label == "Google 加密站內") {
-			var y = url + content.location.host + " " + x;
-		}
-		else {
-			var y = url + x;
-		}
-		switch(event.button) {
-			case 0:
-				gBrowser.selectedTab = gBrowser.addTab(y);
-			break;
-			case 1:
-				loadURI(y);
-			break;
-			case 2:
-				gBrowser.addTab(y);
-			break;
-		}
-	}
 };
 var OpenUrl = {
 	onClick: function(event) {
