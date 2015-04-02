@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           AutoSelectPopup.uc.js
-// @note           28.03.2015 - 新增部份快捷鍵 (F:定位到 findbar, T:新分頁前景, G: Google 加密, H:高亮, S: 定位到 searchbar, U:定位到 urlbar)
+// @note           28.03.2015 - 新增部份快捷鍵 (F: 定位到 findbar, T: 新分頁前景, G: Google 加密, H: 高亮, S: 定位到 searchbar, U: 定位到 urlbar)
 // @note           22.03.2015 - 新增自動複製及統計選取字數
 // @note           20.09.2014 - 新增雙擊頁面觸發彈出，及添加 state 區分按鈕出現條件和在部分網頁不觸發
 // @note           17.09.2014 - 新增搜索菜單按鈕
@@ -54,7 +54,7 @@ location == "chrome://browser/content/browser.xul" && (function() {
 			}));
 			var KeyG = ASPopup.appendChild($C("menuitem", {
 				accesskey: "G",
-				oncommand: "gBrowser.selectedTab = gBrowser.addTab('https://encrypted.google.com/#q=' + encodeURIComponent(getBrowserSelection() || readFromClipboard()));",
+				oncommand: "ASP.EngineSearch('https://encrypted.google.com/#q=');",
 			}));
 			var KeyH = ASPopup.appendChild($C("menuitem", {
 				accesskey: "H",
@@ -148,15 +148,13 @@ location == "chrome://browser/content/browser.xul" && (function() {
 				image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACo0lEQVQ4jY3Mz2vTcBgG8FdnallK3VKW/mAuLLD1B8OlI23arW22NGWHUNMcwkAHybZT0a21uq60PWQDxzwNetCL9KJ40FvBg55E/wTR01BBEMSDB0Xc6vZ6Sike5r7wuTzf530AAMCyrPP1ev2apmlPFUV5eRpN0540m80CAJwD+9g0zcfhcBhDoRCGw+FThUIhjEQiaJpmCwAAGo2GHgwGcWJiomdqaupYFMWPkiS9TSaTP/r/bJFIBGu1mgT5fP4Ry7Jok2X51dbW1rSu6wOtVuuiZVkuwzBucRz3q7/HsiwqirIPkiR1GIZBhmFwfn7+tWVZg2tra9VMJvNZEISfuVzuRbPZDBaLxcLk5OSx3WUYBmVZboMoip1AIIDj4+Mn1WqVX11dvT06OoqBQKAnHo9/2tvbuyRJ0vP+fGFhoQ2pVKrj9XpxZmbmi67rA/F4/MDr9WI/mqZxeXn5uq7rN2ma7uXpdLoNyblkh6Io5DjuQNf1gWg0+o2iKPyXqqo3TNM0+7NUKtWGRCLRcbvdyLLs793dXU86nX7mdruxn9/v725sbEwtLi7u9+eJRKINsVisQ5IkkiSJ+Xx+u9FoXOY47p3L5UKSJNHn8x0pinIHAM4LgvDe7pIkiYIgtIHn+Y7T6USn04kjIyNHhmGsWJY1aBjGVVVVV0qlUtCyrAsAAOvr69Msy361+70Bh8OBNpIkT3ief6Oqam1paakoy/IDnuc/lMvlJABAuVzm/H7/ocPhwFgs1oZMJvOQIAj8n7Gxse+bm5tzOzs7MZ/Pd0gQBIqieA8qlUrW5XKdnGXE4/F0aZruEgSBw8PDfyqVShQAADRN2x4aGjo+ywhBEEhRVLdQKJSg/9VqtVg2m707Ozt7/zS5XG67Xq9fse/+AnDURgQylYErAAAAAElFTkSuQmCC",
 				style: "padding: 0px;",
 				onclick: "\
-				var txt = document.getElementById('searchbar').value || getBrowserSelection() || readFromClipboard();\
 				var url = ['https://encrypted.google.com/#q=', 'http://tieba.baidu.com/f?ie=utf-8&kw=', 'https://encrypted.google.com/#q=site:' + content.location.host + ' '];\
-				gBrowser.selectedTab = gBrowser.addTab(url[event.button] + encodeURIComponent(txt));\
+				ASP.EngineSearch(url[event.button]);\
 				",
 				onDOMMouseScroll: "\
-				var txt = document.getElementById('searchbar').value || getBrowserSelection() || readFromClipboard();\
 				if (event.detail > 0) {var url = 'https://duckduckgo.com/?q=!img ';}\
 				else {var url = 'http://image.baidu.com/i?&cl=2&ie=utf-8&oe=utf-8&word=';}\
-				gBrowser.selectedTab = gBrowser.addTab(url + encodeURIComponent(txt));\
+				ASP.EngineSearch(url);\
 				document.getElementById('AutoSelect-popup').hidePopup();\
 				return;\
 				",
@@ -298,6 +296,10 @@ location == "chrome://browser/content/browser.xul" && (function() {
 					gBrowser.addTab(y);
 				break;
 			}
+		},
+		EngineSearch: function(url) {
+			var txt = getBrowserSelection() || $('searchbar').value || readFromClipboard();
+			gBrowser.selectedTab = gBrowser.addTab(url + encodeURIComponent(txt));
 		},
 		FocusTo: function(ID) {
 			$(ID).value = getBrowserSelection() || readFromClipboard();
