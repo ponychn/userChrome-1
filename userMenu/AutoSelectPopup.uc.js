@@ -6,7 +6,7 @@
 // @note           17.09.2014 - 新增搜索菜單按鈕
 // @note           12.09.2014 - 新增翻譯功能 (P.S. 翻譯字數約 200 字)
 // @note           07.09.2014 - 修改為配置外置版
-// @note           31.07.2014 - 新增按住 C / Ctrl + C 便複製，及按住 V / Ctrl + V 便貼上
+// @note           31.07.2014 - 新增快捷鍵 (C: 複製, V: 貼上)
 // @note           29.07.2014 - 新增限制條件，分別為於輸入框內或當按住 Ctrl/Shift/Alt 時
 // @note           28.07.2014 - 選取文字後自動彈出自定選單
 // @homepageURL    https://github.com/Drager-oos/userChrome/blob/master/userMenu/AutoSelectPopup.uc.js
@@ -62,11 +62,11 @@ location == "chrome://browser/content/browser.xul" && (function() {
 			}));
 			var KeyS = ASPopup.appendChild($C("menuitem", {
 				accesskey: "S",
-				oncommand: "var bar = document.getElementById('searchbar'); bar.value = getBrowserSelection() || readFromClipboard(); bar.focus();",
+				oncommand: "ASP.FocusTo('searchbar');",
 			}));
 			var KeyU = ASPopup.appendChild($C("menuitem", {
 				accesskey: "U",
-				oncommand: "var bar = document.getElementById('urlbar'); bar.value = getBrowserSelection() || readFromClipboard(); bar.focus();",
+				oncommand: "ASP.FocusTo('urlbar');",
 			}));
 			var menuitem = $('devToolsSeparator').parentNode.insertBefore($C('menuitem', {
 				id: 'ASP-menuitem',
@@ -173,7 +173,7 @@ location == "chrome://browser/content/browser.xul" && (function() {
 					image: mi.image,
 					class: "menuitem-iconic",
 					url: mi.url,
-					onclick: "SwitchSearch.onClick(event); event.preventDefault(); event.stopPropagation();"
+					onclick: "ASP.SwitchSearch(event); event.preventDefault(); event.stopPropagation();"
 				}));
 			}
 		},
@@ -227,7 +227,8 @@ location == "chrome://browser/content/browser.xul" && (function() {
 				var eName = e.target.nodeName || e.target.localName || e.target.tagName;
 				if (eName == "TEXTAREA" || eName == "INPUT" || e.target.isContentEditable) return;
 				if (/^about:(blank|newtab|addons|config)/i.test(content.location.toString())) return;
-				if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+				if (content.location.host == "github.com" && eName == "DIV") return;
+				if (e.ctrlKey || e.altKey || e.shiftKey) return;
 				if (e.button == 0 && getBrowserSelection()) {
 					$("AutoSelect-popup").openPopupAtScreen(e.screenX - 60, e.screenY - 40, true);
 					var HideCSS = '\
@@ -239,7 +240,7 @@ location == "chrome://browser/content/browser.xul" && (function() {
 			}, false);
 			gBrowser.mPanelContainer.addEventListener("dblclick", function(e) {
 				if (/^about:(blank|newtab|addons|config)|chrome:\/\/*/i.test(content.location.toString())) return;
-				if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+				if (e.ctrlKey || e.altKey || e.shiftKey) return;
 				if (e.button == 0) {
 					$("AutoSelect-popup").openPopupAtScreen(e.screenX, e.screenY, true);
 					content.document.getSelection().removeAllRanges();
@@ -251,7 +252,7 @@ location == "chrome://browser/content/browser.xul" && (function() {
 				ASP.style = addStyle(HideCSS);
 			}, false);
 			gBrowser.mPanelContainer.addEventListener("mousemove", function(e) {
-				if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+				if (e.ctrlKey || e.altKey || e.shiftKey) return;
 				if (e.button == 0 && getBrowserSelection()) {
 					function countNonAlphabet(str) {
 						var m = str.match(/[^\x00-\x80]/g);
@@ -274,6 +275,33 @@ location == "chrome://browser/content/browser.xul" && (function() {
 					XULBrowserWindow.statusTextField.label = '英文字數：' + wordNum + ' | 中文字數：' + nonSpaceCharNum;
 				}
 			}, false);
+		},
+		SwitchSearch: function(event) {
+			var x = $('searchbar').value || getBrowserSelection() || readFromClipboard(),
+				label = event.target.getAttribute('label'),
+				url = event.target.getAttribute('url');
+			$('searchbar').value = "";
+			if (label == "Google 加密站內") {
+				var y = url + content.location.host + " " + x;
+			}
+			else {
+				var y = url + x;
+			}
+			switch(event.button) {
+				case 0:
+					gBrowser.selectedTab = gBrowser.addTab(y);
+				break;
+				case 1:
+					loadURI(y);
+				break;
+				case 2:
+					gBrowser.addTab(y);
+				break;
+			}
+		},
+		FocusTo: function(ID) {
+			$(ID).value = getBrowserSelection() || readFromClipboard();
+			$(ID).focus();
 		}
 	};
 	var css = '\
