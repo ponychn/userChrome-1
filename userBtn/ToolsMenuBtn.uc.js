@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           ToolsMenuBtn.uc.js
-// @homepageURL    https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/ToolsMenuBtn.uc.js
+// @homepageURL    https://github.com/Drager-oos/userChrome/blob/master/userBtn/ToolsMenuBtn.uc.js
 // ==/UserScript==
 
 location == "chrome://browser/content/browser.xul" && (function() {
