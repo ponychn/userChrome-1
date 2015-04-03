@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           AutoSelectPopup.uc.js
-// @note           28.03.2015 - 新增部份快捷鍵 (F: 定位到 findbar, T: 新分頁前景, G: Google 加密, H: 高亮, S: 定位到 searchbar, U: 定位到 urlbar)
+// @note           28.03.2015 - 新增部份快捷鍵 (F: 定位到 findbar, T: 新分頁前景, G: Google 加密, D: 刪除, H: 高亮, S: 定位到 searchbar, U: 定位到 urlbar)
 // @note           22.03.2015 - 新增自動複製及統計選取字數
 // @note           20.09.2014 - 新增雙擊頁面觸發彈出，及添加 state 區分按鈕出現條件和在部分網頁不觸發
 // @note           17.09.2014 - 新增搜索菜單按鈕
@@ -29,7 +29,7 @@ location == "chrome://browser/content/browser.xul" && (function() {
 				var select = getBrowserSelection();\
 				if (select) {\
 					goDoCommand('cmd_copy');\
-					XULBrowserWindow.statusTextField.label = '已複製：「' + readFromClipboard() + '」';\
+					ASP.ShowPrompt('複製：' + readFromClipboard());\
 				}"
 			}));
 			var ASPMG = ASPopup.appendChild($C("menugroup", {
@@ -55,6 +55,10 @@ location == "chrome://browser/content/browser.xul" && (function() {
 			var KeyG = ASPopup.appendChild($C("menuitem", {
 				accesskey: "G",
 				oncommand: "ASP.EngineSearch('https://encrypted.google.com/#q=');",
+			}));
+			var KeyD = ASPopup.appendChild($C("menuitem", {
+				accesskey: "D",
+				oncommand: "ASP.ShowPrompt('刪除：' + content.getSelection()); content.getSelection().deleteFromDocument(0);",
 			}));
 			var KeyH = ASPopup.appendChild($C("menuitem", {
 				accesskey: "H",
@@ -270,7 +274,7 @@ location == "chrome://browser/content/browser.xul" && (function() {
 					var alphabetWordNum = countAlphabetWord(string);
 					var wordNum = nonAlphabetNum + alphabetWordNum;
 					var nonSpaceCharNum = countNonSpaceChar(string);
-					XULBrowserWindow.statusTextField.label = '英文字數：' + wordNum + ' | 中文字數：' + nonSpaceCharNum;
+					ASP.ShowPrompt('英文字數：' + wordNum + ' | 中文字數：' + nonSpaceCharNum);
 				}
 			}, false);
 		},
@@ -304,7 +308,8 @@ location == "chrome://browser/content/browser.xul" && (function() {
 		FocusTo: function(ID) {
 			$(ID).value = getBrowserSelection() || readFromClipboard();
 			$(ID).focus();
-		}
+		},
+		ShowPrompt: function(str) {XULBrowserWindow.statusTextField.label = str;}
 	};
 	var css = '\
 		#SearchMenu-button dropmarker,\
