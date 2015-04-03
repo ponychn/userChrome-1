@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           FullScreenBrowserManipulateBtn.uc.js
-// @homepageURL    https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/FullScreenBrowserManipulateBtn.uc.js
+// @homepageURL    https://github.com/Drager-oos/userChrome/blob/master/userBtn/FullScreenBrowserManipulateBtn.uc.js
 // ==/UserScript==
 
 location == "chrome://browser/content/browser.xul" && (function() {
