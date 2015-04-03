@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name			NewTabPlus_mod
 // @description		整合版分頁增強
-// @homepageURL    https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/TabPlus.uc.js
+// @homepageURL    https://github.com/Drager-oos/userChrome/blob/master/userBtn/TabPlus.uc.js
 // @include			chrome://browser/content/browser.xul
 // @include			chrome://browser/content/bookmarks/bookmarksPanel.xul
 // @include			chrome://browser/content/history/history-panel.xul
