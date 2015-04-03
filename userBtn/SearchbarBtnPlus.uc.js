@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           SearchbarBtnPlus.uc.js
-// @homepageURL    https://github.com/Drager-oos/userChrome/blob/master/BtnPlus/SearchbarBtnPlus.uc.js
+// @homepageURL    https://github.com/Drager-oos/userChrome/blob/master/userBtn/SearchbarBtnPlus.uc.js
 // ==/UserScript==
 
 /****** 使用方法 ******
@@ -82,6 +82,7 @@ SearchEngine-button
 
 	findMatchCase.addEventListener("click", function(event) {
 		if (event.button == 1) {
+			gFindBar.open();
 			gFindBar._findField.value = readFromClipboard();
 			searchbar.value = readFromClipboard();
 		}
@@ -127,7 +128,7 @@ SearchEngine-button
 				searchbar.value = readFromClipboard();
 			}
 			else {
-//				gFindBar.open();
+				gFindBar.open();
 				gFindBar.toggleHighlight(1);
 				gFindBar.getElement('highlight').setAttribute("checked", "true");
 //				gFindBar.getElement('highlight').setAttribute("checkState", "1");
