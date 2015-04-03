@@ -34,11 +34,11 @@ location == "chrome://browser/content/browser.xul" && (function() {
 	gBrowser.mTabContainer.addEventListener('DOMMouseScroll', function(e) {
 		if (e.target.localName == "tab") {
 			if (e.detail > 0) {
-//				gBrowser.removeAllTabsBut(gBrowser.mCurrentTab);
+				gBrowser.removeAllTabsBut(gBrowser.mCurrentTab);
 				XULBrowserWindow.statusTextField.label = "關閉其他分頁";
-				var tabs = gBrowser.mTabContainer.childNodes;
+/*				var tabs = gBrowser.mTabContainer.childNodes;
 				for (var i = tabs.length - 1; tabs[i] != gBrowser.mCurrentTab; i--) {gBrowser.removeTab(tabs[i]);}
-				for (i--; i >= 0; i--) {gBrowser.removeTab(tabs[i]);}
+				for (i--; i >= 0; i--) {gBrowser.removeTab(tabs[i]);}*/
 			}
 			else {
 				CloseRepeatedTabs();
@@ -55,12 +55,7 @@ location == "chrome://browser/content/browser.xul" && (function() {
 
 	// 中鍵：復原已關閉分頁 & 左鍵：貼上就瀏覽 / Google 加密搜尋 (新分頁前景)
 	gBrowser.mTabContainer.addEventListener("click", function(e) {
-		if (e.target.localName == "tab") {
-			if (e.button == 2) {
-				document.getElementById('tabContextMenu').openPopupAtScreen(e.screenX, e.screenY, true);
-			}
-		}
-		else {
+		if (e.target.localName !== "tab") {
 			if (e.button == 2 && !e.ctrlKey) {
 				XULBrowserWindow.statusTextField.label = "貼上就瀏覽 / Google 加密搜尋 (新分頁前景)";
 				var TXT = getBrowserSelection() || readFromClipboard();
@@ -74,7 +69,6 @@ location == "chrome://browser/content/browser.xul" && (function() {
 				e.stopPropagation();
 			}
 		}
-		return;
 	}, true);
 
 	// 雙擊左鍵：重新載入
