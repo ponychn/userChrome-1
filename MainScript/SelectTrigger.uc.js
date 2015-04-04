@@ -24,17 +24,16 @@ location == "chrome://browser/content/browser.xul" && (function() {
 		init: function() {
 			var STPopup = $("mainPopupSet").appendChild($C("menupopup", {
 				id: "SelectTrigger-popup",
-				style: "-moz-appearance: none; background: -moz-linear-gradient(top, rgb(252, 252, 252) 0%, rgb(245, 245, 245) 33%, rgb(245, 245, 245) 100%); border: 2px solid rgb(144,144,144); border-radius: 5px;",
 				onpopupshown: "\
-				var select = getBrowserSelection();\
-				if (select) {\
+				if (getBrowserSelection()) {\
 					goDoCommand('cmd_copy');\
 					ST.ShowPrompt('複製：' + readFromClipboard());\
 				}"
 			}));
 			var STMG = STPopup.appendChild($C("menugroup", {
 				id: "SelectTrigger-menugroup",
-				onclick: "document.getElementById('SelectTrigger-popup').hidePopup();"
+				onclick: "document.getElementById('SelectTrigger-popup').hidePopup();",
+				onDOMMouseScroll: "document.getElementById('SelectTrigger-popup').hidePopup();"
 			}));
 			var KeyC = STPopup.appendChild($C("menuitem", {
 				accesskey: "C",
@@ -159,13 +158,10 @@ location == "chrome://browser/content/browser.xul" && (function() {
 				if (event.detail > 0) {var url = 'https://duckduckgo.com/?q=!img ';}\
 				else {var url = 'http://image.baidu.com/i?&cl=2&ie=utf-8&oe=utf-8&word=';}\
 				ST.EngineSearch(url);\
-				document.getElementById('SelectTrigger-popup').hidePopup();\
 				return;\
 				",
 			}));
-			var SearchPopup = SearchBtn.appendChild($C("menupopup", {
-				style: "-moz-appearance: none; background: -moz-linear-gradient(top, rgb(252, 252, 252) 0%, rgb(245, 245, 245) 33%, rgb(245, 245, 245) 100%); border: 2px solid rgb(144,144,144); border-radius: 5px;"
-			}));
+			var SearchPopup = SearchBtn.appendChild($C("menupopup", {id: "SearchMenu-popup"}));
 
 			for (var i = 0; i < this.configs.menuitems.length; i++) {
 				var mi = this.configs.menuitems[i];
@@ -312,6 +308,8 @@ location == "chrome://browser/content/browser.xul" && (function() {
 		ShowPrompt: function(str) {XULBrowserWindow.statusTextField.label = str;}
 	};
 	var css = '\
+		#SelectTrigger-popup,\
+		#SearchMenu-popup {-moz-appearance:none; background:-moz-linear-gradient(top, rgb(252, 252, 252) 0%, rgb(245, 245, 245) 33%, rgb(245, 245, 245) 100%); border:2px solid rgb(144,144,144); border-radius:5px;}\
 		#SearchMenu-button dropmarker,\
 		#SelectTrigger-popup autorepeatbutton {display:none;}\
 		#SelectTrigger-popup menuitem:not([class="menuitem-iconic"]) {-moz-appearance:none;}\
