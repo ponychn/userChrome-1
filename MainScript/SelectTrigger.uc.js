@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           SelectTrigger.uc.js
-// @note           28.03.2015 - 新增部份快捷鍵 (F: 定位到 findbar, T: 新分頁前景, G: Google 加密, D: 刪除, H: 高亮, S: 定位到 searchbar, U: 定位到 urlbar)
+// @note           28.03.2015 - 新增部份快捷鍵 (F: 定位到 findbar, A: 新分頁前景, G: Google 加密, B: 百度, T: Google 翻譯, I: Google 加密站內, P: Google 圖片, D: 刪除, H: 高亮, S: 定位到 searchbar, U: 定位到 urlbar)
 // @note           22.03.2015 - 新增自動複製及統計選取字數
 // @note           20.09.2014 - 新增雙擊頁面觸發彈出，及添加 state 區分按鈕出現條件和在部分網頁不觸發
 // @note           17.09.2014 - 新增搜索菜單按鈕
@@ -47,13 +47,29 @@ location == "chrome://browser/content/browser.xul" && (function() {
 				accesskey: "F",
 				command: "cmd_find",
 			}));
-			var KeyT = STPopup.appendChild($C("menuitem", {
-				accesskey: "T",
+			var KeyA = STPopup.appendChild($C("menuitem", {
+				accesskey: "A",
 				oncommand: "gBrowser.selectedTab = gBrowser.addTab(getBrowserSelection() || readFromClipboard());",
 			}));
 			var KeyG = STPopup.appendChild($C("menuitem", {
 				accesskey: "G",
 				oncommand: "ST.EngineSearch('https://encrypted.google.com/#q=');",
+			}));
+			var KeyB = STPopup.appendChild($C("menuitem", {
+				accesskey: "B",
+				oncommand: "ST.EngineSearch('https://www.baidu.com/s?ie=utf-8&wd=');",
+			}));
+			var KeyT = STPopup.appendChild($C("menuitem", {
+				accesskey: "T",
+				oncommand: "ST.EngineSearch('https://translate.google.com/#auto/zh-TW/');",
+			}));
+			var KeyI = STPopup.appendChild($C("menuitem", {
+				accesskey: "I",
+				oncommand: "ST.EngineSearch('https://encrypted.google.com/#q=site:' + content.location.host + ' ');",
+			}));
+			var KeyP = STPopup.appendChild($C("menuitem", {
+				accesskey: "P",
+				oncommand: "ST.EngineSearch('https://duckduckgo.com/?q=!img ');",
 			}));
 			var KeyD = STPopup.appendChild($C("menuitem", {
 				accesskey: "D",
@@ -251,7 +267,7 @@ location == "chrome://browser/content/browser.xul" && (function() {
 			}, false);
 			gBrowser.mPanelContainer.addEventListener("mousemove", function(e) {
 				if (e.ctrlKey || e.altKey || e.shiftKey) return;
-				if (e.button == 0 && getBrowserSelection()) {
+				if (getBrowserSelection()) {
 					function countNonAlphabet(str) {
 						var m = str.match(/[^\x00-\x80]/g);
 						return (!m?0:m.length);
